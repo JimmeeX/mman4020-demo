@@ -13,21 +13,17 @@ Feel free to add ROS packages if need to.
 
 Tested on Ubuntu 18.04 LTS
 
-1. Install SITL & Mavproxy
-https://ardupilot.org/dev/docs/sitl-simulator-software-in-the-loop.html#sitl-simulator-software-in-the-loop
+1. [Install SITL & Mavproxy](https://ardupilot.org/dev/docs/sitl-simulator-software-in-the-loop.html#sitl-simulator-software-in-the-loop)
 
-2. Install ROS
-http://wiki.ros.org/melodic/Installation/Ubuntu
+2. [Install ROS](http://wiki.ros.org/melodic/Installation/Ubuntu)
 
-3. Install MAVROS (Link SITL with ROS)
-https://github.com/mavlink/mavros/blob/master/mavros/README.md#installation (be mindful of ros version)
+3. [Install MAVROS (Link SITL with ROS)](https://github.com/mavlink/mavros/blob/master/mavros/README.md#installation) (be mindful of ros version)
 
-4. Install Arduino IDE, to program the Arduino (https://www.arduino.cc/en/main/software)
+4. [Install Arduino IDE, to program the Arduino](https://www.arduino.cc/en/main/software)
 
-5. Install rosserial (Link Arduino with ROS)
-http://wiki.ros.org/rosserial_arduino/Tutorials/Arduino%20IDE%20Setup (be mindful of ros version)
+5. [Install rosserial (Link Arduino with ROS)](http://wiki.ros.org/rosserial_arduino/Tutorials/Arduino%20IDE%20Setup) (be mindful of ros version)
 
-1. Clone this Repo
+6. Clone this Repo
 
 ## Usage
 
