@@ -1,0 +1,8 @@
+<!-- Launches MAVROs, ROSSERIAL & ROS Code. -->
+<launch>
+    <arg name="port" />
+
+    <include file="$(find sampler)/launch/apm.launch" />
+    <node pkg="rosserial_python" name="serial_node" type="serial_node.py" output="screen" args="$(arg port)" />
+    <node pkg="sampler" name="main" type="main.py" output="screen" />
+</launch>
