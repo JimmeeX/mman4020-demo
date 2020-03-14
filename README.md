@@ -38,22 +38,24 @@ Tested on Ubuntu 18.04 LTS
 sim_vehicle.py -v ArduCopter -L Delta
 ```
 
-2. Start ROS
+2. Run ROS Launch File
+
+This will
+
+- Get ROS to listen to SITL
+- Get ROS to listen to Arduino
+- Run ROS Main Code
+
+Format
 
 ```shell
-roscore
+roslaunch sampler main.launch port:=<arduino port>
 ```
 
-3. Get ROS to listen to SITL
+Example if Arduino is connected to computer's /dev/ttyACM0 port
 
 ```shell
-roslaunch src/launch/apm.launch
-```
-
-4. Get ROS to listen to Arduino. The below example is for a wired connection on port /dev/ttyACM0.
-
-```shell
-rosrun rosserial_python serial_node.py /dev/ttyACM0
+roslaunch sampler main.launch port:=/dev/ttyACM0
 ```
 
 NOTE: I might write a script to automate this later on.
