@@ -1,7 +1,11 @@
 import React from 'react';
 
 const Command = () => {
-  return <h2>Command</h2>;
+  return (
+    <div id='command'>
+      <h2>Commands</h2>
+    </div>
+  );
 };
 
 export default Command;

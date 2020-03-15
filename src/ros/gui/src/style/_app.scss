@@ -1,0 +1,45 @@
+* {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+body {
+  background-color: colour(darker_blue);
+}
+
+#app {
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-areas:
+    'command diagram data'
+    'command diagram data'
+    'command status  data'
+    'command status  data';
+
+  #command {
+    grid-area: command;
+  }
+
+  #data {
+    grid-area: data;
+  }
+
+  #diagram {
+    grid-area: diagram;
+  }
+
+  #status {
+    grid-area: status;
+  }
+}
+
+#command,
+#data,
+#diagram,
+#status {
+  border: 1px solid colour(gray);
+}

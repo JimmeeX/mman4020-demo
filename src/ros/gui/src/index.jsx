@@ -5,6 +5,8 @@ import * as serviceWorker from './serviceWorker';
 
 import ROSLIB from 'roslib';
 
+import './style/main.css';
+
 var ros = new ROSLIB.Ros({
   url: 'ws://localhost:9090'
 });
