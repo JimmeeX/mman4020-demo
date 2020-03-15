@@ -7,8 +7,7 @@ import Status from './pages/Status';
 
 const App = () => {
   return (
-    <div className='App'>
-      <h1>Water Sampler Control</h1>
+    <div id='app'>
       <Command />
       <Data />
       <Diagram />

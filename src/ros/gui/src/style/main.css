@@ -1,1 +1,68 @@
-/* No CSS *//*# sourceMappingURL=main.css.map */
+@import url("https://fonts.googleapis.com/css?family=Roboto&display=swap");
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+h1 {
+  color: #ffffff;
+}
+
+h2 {
+  color: #4aa7cc;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+body {
+  background-color: #040a14;
+}
+
+#app {
+  display: -ms-grid;
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  -ms-grid-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-areas: 'command diagram data' 'command diagram data' 'command status  data' 'command status  data';
+}
+
+#app #command {
+  -ms-grid-row: 1;
+  -ms-grid-row-span: 4;
+  -ms-grid-column: 1;
+  grid-area: command;
+}
+
+#app #data {
+  -ms-grid-row: 1;
+  -ms-grid-row-span: 4;
+  -ms-grid-column: 3;
+  grid-area: data;
+}
+
+#app #diagram {
+  -ms-grid-row: 1;
+  -ms-grid-row-span: 2;
+  -ms-grid-column: 2;
+  grid-area: diagram;
+}
+
+#app #status {
+  -ms-grid-row: 3;
+  -ms-grid-row-span: 2;
+  -ms-grid-column: 2;
+  grid-area: status;
+}
+
+#command,
+#data,
+#diagram,
+#status {
+  border: 1px solid #2a2a2a;
+}
+/*# sourceMappingURL=main.css.map */
