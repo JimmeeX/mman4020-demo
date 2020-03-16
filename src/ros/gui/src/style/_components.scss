@@ -6,7 +6,6 @@
   margin-top: 20px;
 
   height: 50px;
-  // background-color: #aaaaaa;
   border: 2px solid colour(blue);
   &__list {
     display: flex;
@@ -34,7 +33,6 @@
 .button {
   height: 50px;
   width: 150px;
-  // padding: 1rem;
 
   border-radius: 10px 30px 0px 10px;
 
@@ -45,7 +43,6 @@
 .button.large {
   height: 75px;
   width: 200px;
-  // padding: 1.2rem;
 }
 
 .button.blue {
@@ -56,4 +53,50 @@
 .button.red {
   background-color: colour(dark_red);
   border: 2px solid colour(red);
+}
+
+.progress-bar {
+  display: grid;
+  grid-template-columns: 50px auto 75px;
+  grid-template-areas: 'name rect text';
+
+  &__name {
+    grid-area: name;
+    align-self: center;
+    justify-self: center;
+  }
+
+  &__rect {
+    grid-area: rect;
+    align-self: center;
+    justify-self: center;
+
+    position: relative;
+    border: 2px solid colour(blue);
+
+    height: 35px;
+  }
+
+  &__rect-max {
+    position: absolute;
+    height: 100%;
+
+    background-color: colour(darker_blue);
+  }
+
+  &__rect-current {
+    position: absolute;
+    // top: 0px;
+    // bottom: 0px;
+    // position: absolute;
+    height: 100%;
+
+    background-color: colour(dark_blue);
+  }
+
+  &__text {
+    grid-area: text;
+    align-self: center;
+    justify-self: center;
+  }
 }
