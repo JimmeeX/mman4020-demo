@@ -92,6 +92,19 @@ body {
 }
 
 #status {
+  display: grid;
+  grid-template-rows: $title auto;
+  grid-template-areas:
+    'title'
+    'table';
+
+  h2 {
+    grid-area: title;
+  }
+
+  table {
+    grid-area: table;
+  }
 }
 
 #data {
