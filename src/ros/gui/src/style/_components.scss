@@ -1,0 +1,59 @@
+.container {
+  padding: 1rem;
+}
+
+.nav {
+  margin-top: 20px;
+
+  height: 50px;
+  // background-color: #aaaaaa;
+  border: 2px solid colour(blue);
+  &__list {
+    display: flex;
+
+    height: 100%;
+
+    list-style: none;
+  }
+
+  &__item {
+    height: 100%;
+    width: 100%;
+
+    display: grid;
+    place-items: center;
+
+    cursor: pointer;
+  }
+
+  &__item-active {
+    background-color: colour(dark_blue);
+  }
+}
+
+.button {
+  height: 50px;
+  width: 150px;
+  // padding: 1rem;
+
+  border-radius: 10px 30px 0px 10px;
+
+  display: grid;
+  place-items: center;
+}
+
+.button.large {
+  height: 75px;
+  width: 200px;
+  // padding: 1.2rem;
+}
+
+.button.blue {
+  background-color: colour(dark_blue);
+  border: 2px solid colour(blue);
+}
+
+.button.red {
+  background-color: colour(dark_red);
+  border: 2px solid colour(red);
+}

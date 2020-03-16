@@ -43,3 +43,47 @@ body {
 #status {
   border: 1px solid colour(gray);
 }
+
+#command {
+  display: grid;
+
+  grid-template-rows: 75px 75px auto;
+  grid-template-areas:
+    'command-title'
+    'command-nav'
+    'command-buttons';
+
+  h2 {
+    grid-area: command-title;
+  }
+
+  #command-nav {
+    grid-area: command-nav;
+  }
+
+  .command-grid {
+    grid-area: command-buttons;
+
+    height: 100%;
+    width: 100%;
+    padding: 20px 0px 20px 0px;
+
+    display: grid;
+  }
+
+  #command-grid-auto {
+    grid-template-areas:
+      'button-sample'
+      'button-purge'
+      'button-stop';
+  }
+
+  #command-grid-manual {
+    grid-template-areas:
+      'button-pump    button-valve-1'
+      'button-valve-2 button-valve-3'
+      'button-valve-4 button-valve-5'
+      'button-valve-6 button-valve-7'
+      'button-stop    button-stop';
+  }
+}
