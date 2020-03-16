@@ -4,7 +4,7 @@ const Status = () => {
   return (
     <div id='status'>
       <h2>Status</h2>
-      <table>
+      {/* <table>
         <tr>
           <th>Name</th>
           <th>Connection</th>
@@ -15,7 +15,7 @@ const Status = () => {
           <td>a</td>
           <td>b</td>
         </tr>
-      </table>
+      </table> */}
     </div>
   );
 };

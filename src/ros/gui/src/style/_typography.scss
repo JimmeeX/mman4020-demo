@@ -12,3 +12,17 @@ h2 {
   color: colour(blue);
   // font-size: 1.5rem;
 }
+
+.nav {
+  color: colour(white);
+}
+
+.button {
+  font-size: 1rem;
+  color: colour(white);
+}
+
+.button.large {
+  font-size: 1.25rem;
+  color: colour(white);
+}
