@@ -4,13 +4,13 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
-h1 {
+h1,
+p {
   color: colour(white);
 }
 
 h2 {
   color: colour(blue);
-  // font-size: 1.5rem;
 }
 
 .nav {
@@ -25,4 +25,10 @@ h2 {
 .button.large {
   font-size: 1.25rem;
   color: colour(white);
+}
+
+.data-info__container {
+  p {
+    font-size: 2rem;
+  }
 }
