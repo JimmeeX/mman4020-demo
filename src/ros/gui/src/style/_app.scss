@@ -89,6 +89,19 @@ body {
 }
 
 #diagram {
+  display: grid;
+  grid-template-rows: $title auto;
+  grid-template-areas:
+    'title'
+    'diagram';
+
+  &__title {
+    grid-area: title;
+  }
+
+  &__picture {
+    grid-area: diagram;
+  }
 }
 
 #status {
