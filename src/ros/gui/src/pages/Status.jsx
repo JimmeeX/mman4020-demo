@@ -63,18 +63,22 @@ const Status = () => {
     <div id='status' className='container'>
       <h2>Status</h2>
       <table>
-        <tr>
-          <th>Name</th>
-          <th>Connection</th>
-          <th>State</th>
-        </tr>
-        {status.map(item => (
+        <thead>
           <tr>
-            <td>{item.name}</td>
-            <td>{connectionToHTML(item.connection)}</td>
-            <td>{stateToHTML(item.state, item.type)}</td>
+            <th>Name</th>
+            <th>Connection</th>
+            <th>State</th>
           </tr>
-        ))}
+        </thead>
+        <tbody>
+          {status.map(item => (
+            <tr key={item.id}>
+              <td>{item.name}</td>
+              <td>{connectionToHTML(item.connection)}</td>
+              <td>{stateToHTML(item.state, item.type)}</td>
+            </tr>
+          ))}
+        </tbody>
       </table>
     </div>
   );

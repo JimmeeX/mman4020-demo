@@ -65,9 +65,8 @@ body {
 }
 
 #app #diagram {
-  -ms-grid-row: 1;
-  -ms-grid-row-span: 2;
-  -ms-grid-column: 2;
+  -ms-grid-row: 2;
+  -ms-grid-column: 1;
   grid-area: diagram;
 }
 
@@ -122,6 +121,26 @@ body {
 
 #command #command-grid-manual {
       grid-template-areas: 'button-pump    button-valve-1' 'button-valve-2 button-valve-3' 'button-valve-4 button-valve-5' 'button-valve-6 button-valve-7' 'button-stop    button-stop';
+}
+
+#diagram {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-rows: 50px auto;
+      grid-template-rows: 50px auto;
+      grid-template-areas: 'title' 'diagram';
+}
+
+#diagram__title {
+  -ms-grid-row: 1;
+  -ms-grid-column: 1;
+  grid-area: title;
+}
+
+#diagram__picture {
+  -ms-grid-row: 2;
+  -ms-grid-column: 1;
+  grid-area: diagram;
 }
 
 #status {
