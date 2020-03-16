@@ -4,7 +4,9 @@ body {
 }
 
 h1,
-p {
+p,
+th,
+td {
   color: #ffffff;
 }
 
@@ -120,6 +122,26 @@ body {
 
 #command #command-grid-manual {
       grid-template-areas: 'button-pump    button-valve-1' 'button-valve-2 button-valve-3' 'button-valve-4 button-valve-5' 'button-valve-6 button-valve-7' 'button-stop    button-stop';
+}
+
+#status {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-rows: 50px auto;
+      grid-template-rows: 50px auto;
+      grid-template-areas: 'title' 'table';
+}
+
+#status h2 {
+  -ms-grid-row: 1;
+  -ms-grid-column: 1;
+  grid-area: title;
+}
+
+#status table {
+  -ms-grid-row: 2;
+  -ms-grid-column: 1;
+  grid-area: table;
 }
 
 #data {
