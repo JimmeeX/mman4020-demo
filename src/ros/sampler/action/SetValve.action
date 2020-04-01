@@ -1,0 +1,9 @@
+# goal
+int8 id   # {1-7} - Valve
+bool state
+---
+# feedback
+---
+# result
+bool success
+string message

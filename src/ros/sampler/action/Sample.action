@@ -1,0 +1,11 @@
+# goal
+bool[] jars # Selection of Jars
+---
+# feedback
+int32[] capacities # How much water is in each jar
+int32 eta # Estimated time to complete the action
+---
+# result
+int32[] capacities
+bool success
+string message

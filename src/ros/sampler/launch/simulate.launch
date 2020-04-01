@@ -1,0 +1,6 @@
+<!-- Launches MAVROs, ROSSERIAL & ROS Code. -->
+<launch>
+    <!-- <include file="$(find sampler)/launch/apm.launch" /> -->
+    <!-- <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" /> -->
+    <node pkg="sampler" name="main" type="main.py" output="screen" />
+</launch>
