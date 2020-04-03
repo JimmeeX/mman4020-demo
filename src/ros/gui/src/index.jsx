@@ -3,28 +3,7 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
-import ROSLIB from 'roslib';
-
 import './style/main.css';
-
-// var ros = new ROSLIB.Ros({
-//   url: 'ws://localhost:9090'
-// });
-
-// ros.on('connection', function() {
-//   console.log('Connected');
-//   // document.getElementById('status').innerHTML = 'Connected';
-// });
-
-// ros.on('error', function(error) {
-//   console.log('Error');
-//   // document.getElementById('status').innerHTML = 'Error';
-// });
-
-// ros.on('close', function() {
-//   console.log('Closed');
-//   // document.getElementById('status').innerHTML = 'Closed';
-// });
 
 // var txt_listener = new ROSLIB.Topic({
 //   ros: ros,

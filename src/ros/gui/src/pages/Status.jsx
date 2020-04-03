@@ -1,13 +1,15 @@
 import React from 'react';
 
-const Status = () => {
-  const status = [
+const Status = props => {
+  const { ros, status } = props;
+
+  const state = [
     {
       id: 1,
       name: 'Water Sampler',
       type: 'system',
-      connection: true,
-      state: true
+      connection: status === 'Connected',
+      state: status === 'Connected'
     },
     {
       id: 2,
@@ -71,7 +73,7 @@ const Status = () => {
           </tr>
         </thead>
         <tbody>
-          {status.map(item => (
+          {state.map(item => (
             <tr key={item.id}>
               <td>{item.name}</td>
               <td>{connectionToHTML(item.connection)}</td>

@@ -8,9 +8,12 @@ from std_msgs.msg import Bool
 from sampler.msg import (
     PurgeAction,
     SampleAction,
+    SampleFeedback,
+    SampleResult,
     SetPumpAction,
     SetValveAction,
-    StopAction
+    StopAction,
+    StopResult
 )
 
 class Main():
@@ -18,6 +21,7 @@ class Main():
         rospy.loginfo("Starting up Main")
 
         self.num_valves = 7
+        self.rate = rospy.Rate(3)
 
         """Initialise Publishers"""
         # Arduino Control Panel
@@ -87,12 +91,36 @@ class Main():
     def exec_purge(self, goal):
         # TODO
         print("Execute Purge")
+        """
+        1. Check if System is idle
+        2. Close all jar valves
+        3. Open purge valve
+        4. Turn on Pump
+        """
         pass
 
     def exec_stop(self, goal):
-        # TODO
-        print("Execute Stop")
-        pass
+        print("Received Message to Execute 'Stop'")
+        """
+        1. Stop Pump
+        2. Close all valves
+        """
+        # Stop Pump
+        self.pump_pub.publish(False)
+        self.rate.sleep()
+
+        # Close All Valves
+        self.set_jar_valves(False)
+
+        # Return Message
+        result = StopResult(
+            success=True,
+            message='Pump & Valves stopped successfully'
+        )
+        # result.success=True,
+        # result.message='Pump & Valves stopped successfully'
+        self.action_servers['stop'].set_succeeded(result)
+
 
     def exec_set_pump(self, goal):
         print("Execute Set Pump")
@@ -110,6 +138,28 @@ class Main():
         print(goal.state)
         #
         pass
+
+    """CLASS UTILITY FUNCTIONS"""
+    def set_jar_valves(self, value):
+        self.open1_pub.publish(value)
+        self.rate.sleep()
+
+        self.open2_pub.publish(value)
+        self.rate.sleep()
+
+        self.open3_pub.publish(value)
+        self.rate.sleep()
+
+        self.open4_pub.publish(value)
+        self.rate.sleep()
+
+        self.open5_pub.publish(value)
+        self.rate.sleep()
+
+        self.open6_pub.publish(value)
+        self.rate.sleep()
+
+
 
 
 if __name__ == '__main__':
