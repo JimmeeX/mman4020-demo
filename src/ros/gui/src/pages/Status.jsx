@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Status = props => {
-  const { ros, state } = props;
+  const { state } = props;
 
   const status = [
     {
@@ -15,15 +15,15 @@ const Status = props => {
       id: 2,
       name: 'Barometric Sensor',
       type: 'sensor',
-      connection: false,
-      state: false
+      connection: state.baro,
+      state: state.baro
     },
     {
       id: 3,
       name: 'Flow Rate Sensor',
       type: 'sensor',
-      connection: true,
-      state: true
+      connection: state.flow,
+      state: state.flow
     },
     { id: 4, name: 'Pump', type: 'pump', connection: null, state: state.pump },
     {

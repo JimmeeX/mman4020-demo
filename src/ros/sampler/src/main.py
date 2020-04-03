@@ -4,7 +4,7 @@ import roslib
 import rospy
 from actionlib import SimpleActionServer
 
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, Float32
 from sampler.msg import (
     PurgeAction,
     PurgeResult,
@@ -19,12 +19,21 @@ from sampler.msg import (
     StopResult
 )
 
+from Sampler import Sampler
+
+PURGE_DURATION = 30 # Seconds
+NUM_JARS = 6
+NUM_VALVES = 7
+JAR_CAPACITIES = [90] * NUM_JARS # Max Volume (mL)
+
 class Main():
     def __init__(self):
         rospy.loginfo("Starting up Main")
 
-        self.num_valves = 7
         self.rate = rospy.Rate(3)
+
+        """Initialise Water Sampler Class"""
+        self.sampler = Sampler(JAR_CAPACITIES)
 
         """Initialise Publishers"""
         # Arduino Control Panel
@@ -37,6 +46,20 @@ class Main():
         self.valve7_pub = rospy.Publisher("/arduino/valve7", Bool, queue_size=1) # Purge
         self.pump_pub = rospy.Publisher("/arduino/pump", Bool, queue_size=1)
 
+        """Initialise Subscribers"""
+        self.valve1_sub = rospy.Subscriber("/arduino/valve1", Bool, self.handle_valve, (1), queue_size=1) # Jar 1
+        self.valve2_sub = rospy.Subscriber("/arduino/valve2", Bool, self.handle_valve, (2), queue_size=1) # Jar 2
+        self.valve3_sub = rospy.Subscriber("/arduino/valve3", Bool, self.handle_valve, (3), queue_size=1) # Jar 3
+        self.valve4_sub = rospy.Subscriber("/arduino/valve4", Bool, self.handle_valve, (4), queue_size=1) # Jar 4
+        self.valve5_sub = rospy.Subscriber("/arduino/valve5", Bool, self.handle_valve, (5), queue_size=1) # Jar 5
+        self.valve6_sub = rospy.Subscriber("/arduino/valve6", Bool, self.handle_valve, (6), queue_size=1) # Jar 6
+        self.valve7_sub = rospy.Subscriber("/arduino/valve7", Bool, self.handle_valve, (7), queue_size=1) # Purge
+        self.pump_sub = rospy.Subscriber("/arduino/pump", Bool, self.handle_pump, queue_size=1)
+
+        self.flow_sub = rospy.Subscriber("/arduino/flow", Float32, self.handle_flow, queue_size=1) # Flow Rate Sensor
+        self.temp_sub = rospy.Subscriber("/arduino/temp", Float32, self.handle_temp, queue_size=1) # Temperature
+        self.depth_sub = rospy.Subscriber("/arduino/depth", Float32, self.handle_depth, queue_size=1) # Water Depth
+
         """Initialise Action Servers"""
         # GUI Auto Actions
         self.action_servers = {}
@@ -46,7 +69,7 @@ class Main():
 
         # GUI Manual Actions
         self.action_servers['pump'] = SimpleActionServer('pump', SetPumpAction, self.exec_set_pump, auto_start=False)
-        for i in range(self.num_valves):
+        for i in range(NUM_VALVES):
             name = 'valve' + str(i+1)
             self.action_servers[name] = SimpleActionServer(name, SetValveAction, self.exec_set_valve, auto_start=False)
 
@@ -55,7 +78,7 @@ class Main():
             print("Starting AS: " + key)
             value.start()
 
-
+    """CLASS SERVER-SIDE FUNCTIONS"""
     def exec_sample(self, goal):
         print("Execute Sample")
         print(goal.jars)
@@ -74,6 +97,7 @@ class Main():
         #     print("STOPPING")
         #     pass
 
+
     def exec_purge(self, goal):
         # TODO
         print("Execute Purge")
@@ -84,6 +108,7 @@ class Main():
         4. Turn on Pump
         """
         pass
+
 
     def exec_stop(self, goal):
         print("Received Message to Execute 'Stop'")
@@ -124,6 +149,7 @@ class Main():
         )
         self.action_servers['pump'].set_succeeded(result)
 
+
     """Note that this will be run separately for each valve"""
     def exec_set_valve(self, goal):
         """
@@ -154,6 +180,22 @@ class Main():
         )
         self.action_servers['valve' + str(goal.id)].set_succeeded(result)
 
+
+    """CLASS SUBSCRIBER CALLBACKS"""
+    def handle_pump(self, msg):
+        self.sampler.setState('pump', msg.data)
+
+    def handle_valve(self, msg, id):
+        self.sampler.setState('valve' + str(id), msg.data)
+
+    def handle_flow(self, msg):
+        self.sampler.processFlow(msg.data)
+
+    def handle_temp(self, msg):
+        self.sampler.processTemp(msg.data)
+
+    def handle_depth(self, msg):
+        self.sampler.processDepth(msg.data)
 
     """CLASS UTILITY FUNCTIONS"""
     def set_jar_valves(self, value):
