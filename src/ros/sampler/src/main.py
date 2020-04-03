@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import roslib
-roslib.load_manifest('sampler')
 import rospy
 from actionlib import SimpleActionServer
 
@@ -60,6 +59,11 @@ class Main():
         for i in range(self.num_valves):
             name = 'valve' + str(i)
             self.action_servers[name] = SimpleActionServer(name, SetValveAction, self.exec_set_valve, auto_start=False)
+
+        # Start Server
+        for key, value in self.action_servers.items():
+            print("Starting AS: " + key)
+            value.start()
 
 
     def exec_sample(self, goal):
