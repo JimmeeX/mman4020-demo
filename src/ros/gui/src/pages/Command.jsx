@@ -7,12 +7,12 @@ import Nav from '../components/Nav';
 
 const numJars = 6;
 
+const changeStateTimeout = 10000;
+
 const Command = props => {
-  const { ros } = props;
+  const { ros, state } = props;
   const [active, setActive] = useState('auto');
   const [sampleChoice, setSampleChoice] = useState(Array(numJars).fill(false));
-
-  console.log(sampleChoice);
 
   // Initialise ROS Action Clients
   const actionClients = {};
@@ -26,7 +26,8 @@ const Command = props => {
     { serverName: 'valve3', actionName: 'sampler/SetValveAction' },
     { serverName: 'valve4', actionName: 'sampler/SetValveAction' },
     { serverName: 'valve5', actionName: 'sampler/SetValveAction' },
-    { serverName: 'valve6', actionName: 'sampler/SetValveAction' }
+    { serverName: 'valve6', actionName: 'sampler/SetValveAction' },
+    { serverName: 'valve7', actionName: 'sampler/SetValveAction' }
   ];
 
   serverActionNames.map(({ serverName, actionName }) => {
@@ -37,8 +38,6 @@ const Command = props => {
     });
     return null;
   });
-
-  console.log(actionClients);
 
   const handleSample = () => {
     console.log('SAMPLE');
@@ -89,8 +88,6 @@ const Command = props => {
   };
 
   const handleStop = () => {
-    console.log('STOPPING');
-
     const stopGoal = new ROSLIB.Goal({
       actionClient: actionClients['stop'],
       goalMessage: {}
@@ -101,10 +98,41 @@ const Command = props => {
     });
 
     stopGoal.on('timeout', () => {
-      console.log('TIMEOUT');
+      console.log('timeout');
     });
 
-    stopGoal.send(5);
+    stopGoal.send(changeStateTimeout);
+  };
+
+  const handleSetPump = newState => {
+    const setPumpGoal = new ROSLIB.Goal({
+      actionClient: actionClients['pump'],
+      goalMessage: {
+        state: newState
+      }
+    });
+
+    setPumpGoal.on('result', result => {
+      console.log(result);
+    });
+
+    setPumpGoal.send(changeStateTimeout);
+  };
+
+  const handleSetValve = (id, newState) => {
+    const setValveGoal = new ROSLIB.Goal({
+      actionClient: actionClients[`valve${id}`],
+      goalMessage: {
+        id: id,
+        state: newState
+      }
+    });
+
+    setValveGoal.on('result', result => {
+      console.log(result);
+    });
+
+    setValveGoal.send(changeStateTimeout);
   };
 
   const buttons =
@@ -171,66 +199,90 @@ const Command = props => {
           {
             id: 'button-pump',
             key: 1,
-            text: 'Turn Pump Off',
+            text: `Turn Pump ${state.pump ? 'Off' : 'On'}`,
             large: false,
             color: 'blue',
-            popconfirm: null
+            popconfirm: {
+              title: 'Do you want to proceed?',
+              onConfirm: () => handleSetPump(!state.pump)
+            }
           },
           {
             id: 'button-valve-1',
             key: 2,
-            text: 'Close Valve 1',
+            text: `${state.valve1 ? 'Close' : 'Open'} Valve 1`,
             large: false,
             color: 'blue',
-            popconfirm: null
+            popconfirm: {
+              title: 'Do you want to proceed?',
+              onConfirm: () => handleSetValve(1, !state.valve1)
+            }
           },
           {
             id: 'button-valve-2',
             key: 3,
-            text: 'Close Valve 2',
+            text: `${state.valve2 ? 'Close' : 'Open'} Valve 2`,
             large: false,
             color: 'blue',
-            popconfirm: null
+            popconfirm: {
+              title: 'Do you want to proceed?',
+              onConfirm: () => handleSetValve(2, !state.valve2)
+            }
           },
           {
             id: 'button-valve-3',
             key: 4,
-            text: 'Close Valve 3',
+            text: `${state.valve3 ? 'Close' : 'Open'} Valve 3`,
             large: false,
             color: 'blue',
-            popconfirm: null
+            popconfirm: {
+              title: 'Do you want to proceed?',
+              onConfirm: () => handleSetValve(3, !state.valve3)
+            }
           },
           {
             id: 'button-valve-4',
             key: 5,
-            text: 'Close Valve 4',
+            text: `${state.valve4 ? 'Close' : 'Open'} Valve 4`,
             large: false,
             color: 'blue',
-            popconfirm: null
+            popconfirm: {
+              title: 'Do you want to proceed?',
+              onConfirm: () => handleSetValve(4, !state.valve4)
+            }
           },
           {
             id: 'button-valve-5',
             key: 6,
-            text: 'Close Valve 5',
+            text: `${state.valve5 ? 'Close' : 'Open'} Valve 5`,
             large: false,
             color: 'blue',
-            popconfirm: null
+            popconfirm: {
+              title: 'Do you want to proceed?',
+              onConfirm: () => handleSetValve(5, !state.valve5)
+            }
           },
           {
             id: 'button-valve-6',
             key: 7,
-            text: 'Close Valve 6',
+            text: `${state.valve6 ? 'Close' : 'Open'} Valve 6`,
             large: false,
             color: 'blue',
-            popconfirm: null
+            popconfirm: {
+              title: 'Do you want to proceed?',
+              onConfirm: () => handleSetValve(6, !state.valve6)
+            }
           },
           {
             id: 'button-valve-7',
             key: 8,
-            text: 'Close Valve 7',
+            text: `${state.valve7 ? 'Close' : 'Open'} Valve 7`,
             large: false,
             color: 'blue',
-            popconfirm: null
+            popconfirm: {
+              title: 'Do you want to proceed?',
+              onConfirm: () => handleSetValve(7, !state.valve7)
+            }
           },
           {
             id: 'button-stop',
@@ -246,12 +298,6 @@ const Command = props => {
         ];
 
   const buttonsList = buttons.map(item => {
-    const buttonStyle = {
-      gridArea: item.id,
-      alignSelf: 'center',
-      justifySelf: 'center'
-    };
-
     const buttonComponent = (
       <Button
         id={item.id}

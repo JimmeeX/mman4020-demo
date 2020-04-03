@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ROSLIB from 'roslib';
 
 import Command from './pages/Command';
@@ -6,41 +6,94 @@ import Data from './pages/Data';
 import Diagram from './pages/Diagram';
 import Status from './pages/Status';
 
+const componentNames = [
+  'pump',
+  'valve1',
+  'valve2',
+  'valve3',
+  'valve4',
+  'valve5',
+  'valve6',
+  'valve7'
+];
+
+const rosTopics = {};
+
+const ros = new ROSLIB.Ros({
+  url: 'ws://localhost:9090'
+});
+
+componentNames.map(name => {
+  // Get Topic
+  rosTopics[name] = new ROSLIB.Topic({
+    ros: ros,
+    name: `/arduino/${name}`,
+    messageType: 'std_msgs/Bool'
+  });
+  return null;
+});
+
 const App = () => {
-  const [status, setStatus] = useState('Closed');
-
-  const ros = new ROSLIB.Ros({
-    url: 'ws://localhost:9090'
+  const [state, setState] = useState({
+    ros: false,
+    baro: false,
+    flow: true,
+    pump: true,
+    valve1: true,
+    valve2: false,
+    valve3: false,
+    valve4: false,
+    valve5: false,
+    valve6: false,
+    valve7: false
   });
 
-  // Check ROS Connection
-  ros.on('connection', () => {
-    if (status !== 'Connected') {
-      console.log('Established Connection with ROS');
-      setStatus('Connected');
-    }
+  useEffect(() => {
+    // Check ROS Connection
+    ros.on('connection', () => {
+      if (!state.ros) {
+        console.log('Established Connection with ROS');
+        setState({ ...state, ros: true });
+      }
+    });
+
+    ros.on('error', error => {
+      if (state.ros) {
+        console.log(`Connection Error: ${error}`);
+        setState({ ...state, ros: false });
+      }
+    });
+
+    ros.on('close', () => {
+      if (state.ros) {
+        console.log('Closed Connection with ROS');
+        setState({ ...state, ros: false });
+      }
+    });
   });
 
-  ros.on('error', error => {
-    if (status !== 'Closed') {
-      console.log(`Connection Error: ${error}`);
-      setStatus('Closed');
-    }
+  componentNames.map(name => {
+    // Subscribe
+    rosTopics[name].subscribe(msg => {
+      if (state[name] !== msg.data) {
+        // console.log(name, msg.data);
+        // console.log({ ...state, [name]: msg.data });
+        setState({ ...state, [name]: msg.data });
+      }
+    });
+    return null;
   });
 
-  ros.on('close', () => {
-    if (status !== 'Closed') {
-      console.log('Closed Connection with ROS');
-      setStatus('Closed');
-    }
-  });
+  // rosTopics['pump'].subscribe();
+
+  // console.log(state);
 
   return (
     <div id='app'>
-      <Command ros={ros} />
+      <Command ros={ros} state={state} />
       <Data ros={ros} />
       <Diagram />
-      <Status ros={ros} status={status} />
+      <Status ros={ros} state={state} />
     </div>
   );
 };
