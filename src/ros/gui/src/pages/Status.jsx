@@ -1,15 +1,15 @@
 import React from 'react';
 
 const Status = props => {
-  const { ros, status } = props;
+  const { ros, state } = props;
 
-  const state = [
+  const status = [
     {
       id: 1,
       name: 'Water Sampler',
       type: 'system',
-      connection: status === 'Connected',
-      state: status === 'Connected'
+      connection: state.ros,
+      state: state.ros
     },
     {
       id: 2,
@@ -25,14 +25,56 @@ const Status = props => {
       connection: true,
       state: true
     },
-    { id: 4, name: 'Pump', type: 'pump', connection: null, state: true },
-    { id: 5, name: 'Valve 1', type: 'valve', connection: null, state: true },
-    { id: 6, name: 'Valve 2', type: 'valve', connection: null, state: true },
-    { id: 7, name: 'Valve 3', type: 'valve', connection: null, state: false },
-    { id: 8, name: 'Valve 4', type: 'valve', connection: null, state: true },
-    { id: 9, name: 'Valve 5', type: 'valve', connection: null, state: false },
-    { id: 10, name: 'Valve 6', type: 'valve', connection: null, state: false },
-    { id: 11, name: 'Valve 7', type: 'valve', connection: null, state: false }
+    { id: 4, name: 'Pump', type: 'pump', connection: null, state: state.pump },
+    {
+      id: 5,
+      name: 'Valve 1',
+      type: 'valve',
+      connection: null,
+      state: state.valve1
+    },
+    {
+      id: 6,
+      name: 'Valve 2',
+      type: 'valve',
+      connection: null,
+      state: state.valve2
+    },
+    {
+      id: 7,
+      name: 'Valve 3',
+      type: 'valve',
+      connection: null,
+      state: state.valve3
+    },
+    {
+      id: 8,
+      name: 'Valve 4',
+      type: 'valve',
+      connection: null,
+      state: state.valve4
+    },
+    {
+      id: 9,
+      name: 'Valve 5',
+      type: 'valve',
+      connection: null,
+      state: state.valve5
+    },
+    {
+      id: 10,
+      name: 'Valve 6',
+      type: 'valve',
+      connection: null,
+      state: state.valve6
+    },
+    {
+      id: 11,
+      name: 'Valve 7',
+      type: 'valve',
+      connection: null,
+      state: state.valve7
+    }
   ];
 
   const connectionToHTML = connection => {
@@ -73,7 +115,7 @@ const Status = props => {
           </tr>
         </thead>
         <tbody>
-          {state.map(item => (
+          {status.map(item => (
             <tr key={item.id}>
               <td>{item.name}</td>
               <td>{connectionToHTML(item.connection)}</td>
