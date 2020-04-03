@@ -76,24 +76,18 @@ const App = () => {
     // Subscribe
     rosTopics[name].subscribe(msg => {
       if (state[name] !== msg.data) {
-        // console.log(name, msg.data);
-        // console.log({ ...state, [name]: msg.data });
         setState({ ...state, [name]: msg.data });
       }
     });
     return null;
   });
 
-  // rosTopics['pump'].subscribe();
-
-  // console.log(state);
-
   return (
     <div id='app'>
       <Command ros={ros} state={state} />
       <Data ros={ros} />
       <Diagram />
-      <Status ros={ros} state={state} />
+      <Status state={state} />
     </div>
   );
 };
