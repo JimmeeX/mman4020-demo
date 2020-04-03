@@ -190,3 +190,8 @@ body {
     }
   }
 }
+
+.sample-form {
+  display: grid;
+  grid-template-areas: 'jar1 jar2 jar3 jar4 jar5 jar6';
+}

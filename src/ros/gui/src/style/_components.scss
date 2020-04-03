@@ -38,6 +38,7 @@
 
   display: grid;
   place-items: center;
+  cursor: pointer;
 }
 
 .button.large {
@@ -98,5 +99,75 @@
     grid-area: text;
     align-self: center;
     justify-self: center;
+  }
+}
+
+.modal {
+  &__popup {
+    position: fixed;
+    z-index: 1;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+
+    display: grid;
+  }
+  &__body {
+    width: 600px;
+    height: 200px;
+    place-self: center;
+    // margin: 5rem;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr auto 1fr;
+    grid-template-areas:
+      'title title title title'
+      'content content content content'
+      '. . cancel ok';
+
+    background-color: colour(grey);
+
+    &__title {
+      grid-area: title;
+      place-self: center;
+    }
+
+    &__content {
+      grid-area: content;
+      justify-self: center;
+      width: 100%;
+      // place-self: center;
+    }
+
+    &__cancel {
+      grid-area: cancel;
+      place-self: center;
+
+      background-color: colour(dark_red);
+      border: 2px solid colour(red);
+    }
+
+    &__ok {
+      grid-area: ok;
+      place-self: center;
+
+      background-color: colour(dark_blue);
+      border: 2px solid colour(blue);
+    }
+
+    button {
+      width: 80px;
+      padding: 0.5rem 1rem;
+
+      border-radius: 10px;
+
+      cursor: pointer;
+    }
+  }
+
+  &__main {
   }
 }
