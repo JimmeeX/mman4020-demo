@@ -22,6 +22,9 @@ class Sampler():
             'valve7': False,
         }
 
+        # Recommend to Purge before sampling
+        self.is_purged = False
+
         # Sensor Values (5 most recent)
         self.flow_rate = []
         self.temperature = []
@@ -39,15 +42,22 @@ class Sampler():
     def setState(self, key, value):
         self.state[key] = value
 
+
+    def setPurged(self, value):
+        self.is_purged = value
+
+
     def processFlow(self, value):
         self.flow_rate.append(value)
         if len(self.flow_rate) > HISTORY_SIZE:
             self.flow_rate.pop(0)
 
+
     def processTemp(self, value):
         self.temperature.append(value)
         if len(self.temperature) > HISTORY_SIZE:
             self.temperature.pop(0)
+
 
     def processDepth(self, value):
         self.water_depth.append(value)
