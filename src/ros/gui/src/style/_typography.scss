@@ -29,8 +29,23 @@ h2 {
   color: colour(white);
 }
 
+.modal {
+  h3 {
+    color: colour(white);
+    font-size: 1.5rem;
+  }
+
+  button {
+    color: colour(white);
+  }
+}
+
 .data-info__container {
   p {
     font-size: 2rem;
   }
+}
+
+.checkbox__label {
+  color: colour(white);
 }
