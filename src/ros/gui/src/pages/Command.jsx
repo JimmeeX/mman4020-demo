@@ -1,4 +1,5 @@
 import React, { Fragment, useState } from 'react';
+import ROSLIB from 'roslib';
 
 import Button from '../components/Button';
 import Modal from '../components/Modal';
@@ -6,26 +7,104 @@ import Nav from '../components/Nav';
 
 const numJars = 6;
 
-const Command = () => {
+const Command = props => {
+  const { ros } = props;
   const [active, setActive] = useState('auto');
   const [sampleChoice, setSampleChoice] = useState(Array(numJars).fill(false));
 
   console.log(sampleChoice);
 
+  // Initialise ROS Action Clients
+  const actionClients = {};
+  const serverActionNames = [
+    { serverName: 'sample', actionName: 'sampler/SampleAction' },
+    { serverName: 'purge', actionName: 'sampler/PurgeAction' },
+    { serverName: 'stop', actionName: 'sampler/StopAction' },
+    { serverName: 'pump', actionName: 'sampler/SetPumpAction' },
+    { serverName: 'valve1', actionName: 'sampler/SetValveAction' },
+    { serverName: 'valve2', actionName: 'sampler/SetValveAction' },
+    { serverName: 'valve3', actionName: 'sampler/SetValveAction' },
+    { serverName: 'valve4', actionName: 'sampler/SetValveAction' },
+    { serverName: 'valve5', actionName: 'sampler/SetValveAction' },
+    { serverName: 'valve6', actionName: 'sampler/SetValveAction' }
+  ];
+
+  serverActionNames.map(({ serverName, actionName }) => {
+    actionClients[serverName] = new ROSLIB.ActionClient({
+      ros: ros,
+      serverName: `/${serverName}`,
+      actionName: actionName
+    });
+    return null;
+  });
+
+  console.log(actionClients);
+
   const handleSample = () => {
     console.log('SAMPLE');
+
+    const sampleGoal = new ROSLIB.Goal({
+      actionClient: actionClients['sample'],
+      goalMessage: {
+        jars: sampleChoice
+      }
+    });
+
+    sampleGoal.on('feedback', feedback => {
+      // TODO
+      console.log(feedback.capacities);
+      console.log(feedback.eta);
+    });
+
+    sampleGoal.on('result', result => {
+      // TODO
+      console.log(result.capacities);
+      console.log(result.success);
+      console.log(result.message);
+    });
+
+    sampleGoal.send();
   };
 
   const handlePurge = () => {
     console.log('PURGING');
+
+    const purgeGoal = new ROSLIB.Goal({
+      actionClient: actionClients['purge'],
+      goalMessage: {}
+    });
+
+    purgeGoal.on('feedback', feedback => {
+      // TODO
+      console.log(feedback.eta);
+    });
+
+    purgeGoal.on('result', result => {
+      // TODO
+      console.log(result.success);
+      console.log(result.message);
+    });
+
+    purgeGoal.send();
   };
 
   const handleStop = () => {
     console.log('STOPPING');
-  };
 
-  const handleCancel = () => {
-    console.log('CANCEL');
+    const stopGoal = new ROSLIB.Goal({
+      actionClient: actionClients['stop'],
+      goalMessage: {}
+    });
+
+    stopGoal.on('result', result => {
+      console.log(result);
+    });
+
+    stopGoal.on('timeout', () => {
+      console.log('TIMEOUT');
+    });
+
+    stopGoal.send(5);
   };
 
   const buttons =
@@ -47,6 +126,10 @@ const Command = () => {
                       <input
                         type='checkbox'
                         className='checkbox__value'
+                        style={{
+                          gridArea: `jar${i + 1}`,
+                          placeSelf: 'center'
+                        }}
                         checked={choice}
                         onChange={() => {
                           const sampleChoiceCopy = sampleChoice.slice(); // Copy of array

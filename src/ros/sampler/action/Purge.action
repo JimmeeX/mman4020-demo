@@ -1,8 +1,8 @@
 # goal
 ---
-# feedback
-int32 eta
----
 # result
 bool success
 string message
+---
+# feedback
+int32 eta
