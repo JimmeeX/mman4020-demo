@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import ROSLIB from 'roslib';
+import { ToastContainer, toast } from 'react-toastify';
 
 import Button from '../components/Button';
 import Modal from '../components/Modal';
@@ -11,11 +12,19 @@ const changeStateTimeout = 10000;
 
 const Command = props => {
   const { ros, state } = props;
+
   const [active, setActive] = useState('auto');
   const [sampleChoice, setSampleChoice] = useState(Array(numJars).fill(false));
+  const [disabled, setDisabled] = useState({
+    sample: false,
+    purge: false,
+    stop: false
+  });
 
   // Initialise ROS Action Clients
   const actionClients = {};
+  const actionGoals = {};
+
   const serverActionNames = [
     { serverName: 'sample', actionName: 'sampler/SampleAction' },
     { serverName: 'purge', actionName: 'sampler/PurgeAction' },
@@ -36,12 +45,23 @@ const Command = props => {
       serverName: `/${serverName}`,
       actionName: actionName
     });
+
+    const actionClient = new ROSLIB.ActionClient({
+      ros: ros,
+      serverName: `/${serverName}`,
+      actionName: actionName
+    });
+
+    actionGoals[serverName] = new ROSLIB.Goal({
+      actionClient: actionClient,
+      goalMessage: {}
+    });
     return null;
   });
 
   const handleSample = () => {
-    console.log('SAMPLE');
-
+    setDisabled({ ...disabled, sample: true, purge: true });
+    // actionGoals['sample'].goalMessage =
     const sampleGoal = new ROSLIB.Goal({
       actionClient: actionClients['sample'],
       goalMessage: {
@@ -56,52 +76,69 @@ const Command = props => {
     });
 
     sampleGoal.on('result', result => {
-      // TODO
-      console.log(result.capacities);
-      console.log(result.success);
-      console.log(result.message);
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+      setDisabled({ ...disabled, sample: false, purge: false });
     });
 
     sampleGoal.send();
+    toast.info("Sent 'sample' message to drone.");
   };
 
   const handlePurge = () => {
-    console.log('PURGING');
-
+    setDisabled({ ...disabled, sample: true, purge: true });
     const purgeGoal = new ROSLIB.Goal({
       actionClient: actionClients['purge'],
       goalMessage: {}
     });
 
-    purgeGoal.on('feedback', feedback => {
-      // TODO
+    actionGoals['purge'].on('feedback', feedback => {
       console.log(feedback.eta);
     });
 
-    purgeGoal.on('result', result => {
-      // TODO
-      console.log(result.success);
-      console.log(result.message);
+    actionGoals['purge'].on('result', result => {
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+      setDisabled({ ...disabled, sample: false, purge: false });
     });
 
-    purgeGoal.send();
+    actionGoals['purge'].send();
+    toast.info("Sent 'purge' message to drone.");
   };
 
   const handleStop = () => {
+    setDisabled({ pump: true, purge: true, stop: true });
     const stopGoal = new ROSLIB.Goal({
       actionClient: actionClients['stop'],
       goalMessage: {}
     });
 
-    stopGoal.on('result', result => {
-      console.log(result);
+    actionGoals['stop'].on('result', result => {
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+      setDisabled({ pump: false, purge: false, stop: false });
     });
 
-    stopGoal.on('timeout', () => {
-      console.log('timeout');
+    actionGoals['stop'].on('timeout', () => {
+      // Send Request to Stop
+      toast.error('Stop request timed out');
+      stopGoal.cancel();
     });
 
-    stopGoal.send(changeStateTimeout);
+    actionGoals['stop'].send(changeStateTimeout);
+    // actionGoals['purge'].send();
+    actionGoals['purge'].cancel();
+    actionGoals['sample'].cancel();
+    toast.info("Sent 'stop' message to drone.");
   };
 
   const handleSetPump = newState => {
@@ -113,10 +150,17 @@ const Command = props => {
     });
 
     setPumpGoal.on('result', result => {
-      console.log(result);
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
     });
 
     setPumpGoal.send(changeStateTimeout);
+    toast.info(
+      `Sent 'set pump to ${newState ? 'on' : 'off'}' message to drone.`
+    );
   };
 
   const handleSetValve = (id, newState) => {
@@ -129,10 +173,17 @@ const Command = props => {
     });
 
     setValveGoal.on('result', result => {
-      console.log(result);
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
     });
 
     setValveGoal.send(changeStateTimeout);
+    toast.info(
+      `Sent 'set valve ${id} to ${newState ? 'on' : 'off'}' message to drone.`
+    );
   };
 
   const buttons =
@@ -144,6 +195,7 @@ const Command = props => {
             text: 'Start Sampling',
             large: true,
             color: 'blue',
+            disabled: disabled.sample,
             popconfirm: {
               title: 'Choose Jars to Sample',
               content: (
@@ -178,6 +230,7 @@ const Command = props => {
             text: 'Purge Pump',
             large: true,
             color: 'blue',
+            disabled: disabled.purge,
             popconfirm: {
               title: 'Do you want to proceed?',
               onConfirm: () => handlePurge()
@@ -189,6 +242,7 @@ const Command = props => {
             text: 'Emergency Stop',
             large: true,
             color: 'red',
+            disabled: disabled.stop,
             popconfirm: {
               title: 'Do you want to proceed?',
               onConfirm: () => handleStop()
@@ -290,6 +344,7 @@ const Command = props => {
             text: 'Emergency Stop',
             large: true,
             color: 'red',
+            disabled: disabled.stop,
             popconfirm: {
               title: 'Do you want to proceed?',
               onConfirm: () => handleStop()
@@ -304,6 +359,7 @@ const Command = props => {
         text={item.text}
         large={item.large}
         color={item.color}
+        disabled={item.disabled}
         style={{
           gridArea: item.id,
           alignSelf: 'center',
@@ -316,6 +372,7 @@ const Command = props => {
       <Modal
         key={item.key}
         {...item.popconfirm}
+        disabled={item.disabled}
         style={{
           gridArea: item.id,
           alignSelf: 'center',
@@ -336,28 +393,7 @@ const Command = props => {
       <div id={`command-grid-${active}`} className='command-grid'>
         {buttonsList}
       </div>
-
-      {/* {active === 'Auto' ? (
-        <div id='command-grid-auto' className='command-grid'>
-          {buttons.map(item, i) =>
-            <>
-              <Button {...item} style={{gridArea: item.id}} />
-            </>
-          }
-        </div>
-      ) : (
-        <div id='command-grid-manual' className='command-grid'>
-          <Button id='button-pump' text='Turn Pump Off' />
-          <Button id='button-valve-1' text='Close Valve 1' />
-          <Button id='button-valve-2' text='Close Valve 2' />
-          <Button id='button-valve-3' text='Close Valve 3' />
-          <Button id='button-valve-4' text='Close Valve 4' />
-          <Button id='button-valve-5' text='Close Valve 5' />
-          <Button id='button-valve-6' text='Close Valve 6' />
-          <Button id='button-valve-7' text='Close Valve 7' />
-          <Button id='button-stop' large color='red' text='Emergency Stop' />
-        </div>
-      )} */}
+      <ToastContainer />
     </div>
   );
 };

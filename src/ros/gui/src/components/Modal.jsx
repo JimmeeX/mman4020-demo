@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const Modal = props => {
-  const { children, title, content, onConfirm, style } = props;
+  const { children, title, content, onConfirm, style, disabled } = props;
   const [visible, setVisible] = useState(false);
 
   return (
@@ -29,7 +29,10 @@ const Modal = props => {
           </div>
         </div>
       )}
-      <div className='modal__main' onClick={() => setVisible(true)}>
+      <div
+        className='modal__main'
+        onClick={() => !disabled && setVisible(true)}
+      >
         {children}
       </div>
     </div>

@@ -56,6 +56,10 @@
   border: 2px solid colour(red);
 }
 
+.button.disabled {
+  filter: saturate(0);
+}
+
 .progress-bar {
   display: grid;
   grid-template-columns: 50px auto 75px;

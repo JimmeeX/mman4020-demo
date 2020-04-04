@@ -47,11 +47,12 @@ body {
 #command {
   display: grid;
 
-  grid-template-rows: $title 75px auto;
+  grid-template-rows: $title 75px auto 0px;
   grid-template-areas:
     'command-title'
     'command-nav'
-    'command-buttons';
+    'command-buttons'
+    '.';
 
   h2 {
     grid-area: command-title;

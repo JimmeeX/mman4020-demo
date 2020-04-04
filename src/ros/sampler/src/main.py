@@ -2,7 +2,7 @@
 
 import roslib
 import rospy
-from actionlib import SimpleActionServer
+from actionlib import SimpleActionServer, ActionServer
 
 from std_msgs.msg import Bool, Float32
 from sampler.msg import (
@@ -93,6 +93,7 @@ class Main():
             print("Starting AS: " + key)
             value.start()
 
+
     """CLASS SERVER-SIDE FUNCTIONS"""
     def exec_sample(self, goal):
         print("Execute Sample")
@@ -100,6 +101,7 @@ class Main():
         """
         # TODO
         1. Check if system is idle
+        2. Warn if system is not purged yet
         2. Open Specified Jar Valves. Ensure rest of valves are closed.
         3. Run the Pump
         4. Estimate Jar Capacity (dt * flow rate = volume). You might need to consider stuff like
@@ -111,8 +113,7 @@ class Main():
 
 
     def exec_purge(self, goal):
-        # TODO HANDLE STOP REQUEST
-        print("Execute Purge")
+        print("Received Message to Execute 'Purge'")
         """
         1. Check if System is idle
         2. Close all jar valves
@@ -127,6 +128,7 @@ class Main():
             )
             self.action_servers['purge'].set_aborted(result)
         else:
+            success = True
             # Close Jar Valves
             self.set_jar_valves(False)
 
@@ -142,6 +144,15 @@ class Main():
             feedback = PurgeFeedback()
             counter = 0
             while counter < PURGE_DURATION * SLEEP_RATE:
+                # Check Cancel Request
+                print(vars(self.action_servers['purge']))
+
+                if self.action_servers['purge'].is_preempt_requested():
+                    # TODO: For some reason, sending cancel() does not set is_preempt_requested() to true...
+                    print("Received request to cancel 'Purge'")
+                    self.action_servers['purge'].set_preempted()
+                    success = False
+                    break
                 counter += 1
                 feedback.eta = PURGE_DURATION - (counter // SLEEP_RATE)
                 self.action_servers['purge'].publish_feedback(feedback)
@@ -158,12 +169,13 @@ class Main():
             # Update Sampler State
             self.sampler.setPurged(True)
 
-            # Return Message
-            result = PurgeResult(
-                success=True,
-                message='Purging process completed successfully'
-            )
-            self.action_servers['purge'].set_succeeded(result)
+            # Return Message if successful
+            if success:
+                result = PurgeResult(
+                    success=True,
+                    message='Purging process completed successfully'
+                )
+                self.action_servers['purge'].set_succeeded(result)
 
 
 
