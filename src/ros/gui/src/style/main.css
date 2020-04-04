@@ -19,7 +19,7 @@ h2 {
 }
 
 .button {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #ffffff;
 }
 
@@ -303,8 +303,8 @@ body {
 }
 
 .button {
-  height: 50px;
-  width: 150px;
+  height: 45px;
+  width: 100px;
   border-radius: 10px 30px 0px 10px;
   display: -ms-grid;
   display: grid;

@@ -1,8 +1,8 @@
 import React from 'react';
 
-const maxWidth = 200;
+const maxWidth = 150;
 
-const ProgressBar = props => {
+const ProgressBar = (props) => {
   const { id, name, current, max, units } = props;
 
   const currWidth = (current / max) * maxWidth;

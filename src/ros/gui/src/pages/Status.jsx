@@ -1,29 +1,29 @@
 import React from 'react';
 
-const Status = props => {
+const Status = (props) => {
   const { state } = props;
 
   const status = [
     {
       id: 1,
-      name: 'Water Sampler',
+      name: 'System',
       type: 'system',
       connection: state.ros,
-      state: state.ros
+      state: state.ros,
     },
     {
       id: 2,
-      name: 'Barometric Sensor',
+      name: 'Barometer',
       type: 'sensor',
       connection: !!state.baro,
-      state: !!state.baro
+      state: !!state.baro,
     },
     {
       id: 3,
-      name: 'Flow Rate Sensor',
+      name: 'Flow Sensor',
       type: 'sensor',
       connection: !!state.flow,
-      state: !!state.flow
+      state: !!state.flow,
     },
     { id: 4, name: 'Pump', type: 'pump', connection: null, state: state.pump },
     {
@@ -31,58 +31,58 @@ const Status = props => {
       name: 'Valve 1',
       type: 'valve',
       connection: null,
-      state: state.valve1
+      state: state.valve1,
     },
     {
       id: 6,
       name: 'Valve 2',
       type: 'valve',
       connection: null,
-      state: state.valve2
+      state: state.valve2,
     },
     {
       id: 7,
       name: 'Valve 3',
       type: 'valve',
       connection: null,
-      state: state.valve3
+      state: state.valve3,
     },
     {
       id: 8,
       name: 'Valve 4',
       type: 'valve',
       connection: null,
-      state: state.valve4
+      state: state.valve4,
     },
     {
       id: 9,
       name: 'Valve 5',
       type: 'valve',
       connection: null,
-      state: state.valve5
+      state: state.valve5,
     },
     {
       id: 10,
       name: 'Valve 6',
       type: 'valve',
       connection: null,
-      state: state.valve6
+      state: state.valve6,
     },
     {
       id: 11,
       name: 'Valve 7',
       type: 'valve',
       connection: null,
-      state: state.valve7
-    }
+      state: state.valve7,
+    },
   ];
 
-  const connectionToHTML = connection => {
+  const connectionToHTML = (connection) => {
     switch (connection) {
       case true:
-        return <p style={{ color: 'green' }}>CONNECTED</p>;
+        return <p style={{ color: 'green' }}>YES</p>;
       case false:
-        return <p style={{ color: 'red' }}>NOT CONNECTED</p>;
+        return <p style={{ color: 'red' }}>NO</p>;
       default:
         return <p>N/A</p>;
     }
@@ -110,12 +110,12 @@ const Status = props => {
         <thead>
           <tr>
             <th>Name</th>
-            <th>Connection</th>
+            <th>Connected</th>
             <th>State</th>
           </tr>
         </thead>
         <tbody>
-          {status.map(item => (
+          {status.map((item) => (
             <tr key={item.id}>
               <td>{item.name}</td>
               <td>{connectionToHTML(item.connection)}</td>
