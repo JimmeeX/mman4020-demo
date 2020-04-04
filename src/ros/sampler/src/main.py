@@ -113,7 +113,7 @@ class Main():
 
     """CLASS SERVER-SIDE FUNCTIONS"""
     def exec_sample(self, goal):
-        print("Received Message to Execute 'Sample' on " + str(goal.jars))
+        print("Received Message to Execute 'Sample'")
         """
         1. Check if system is idle
         2. Warn if system is not purged yet
@@ -127,6 +127,7 @@ class Main():
         """
         if self.sampler.state['pump']:
             # Return Error Message to Wait
+            print("System is not idle. Sending 'Sample' Error Message to Web GUI")
             result = SampleResult(
                 capacities=self.sampler.volume,
                 success=False,
@@ -136,6 +137,7 @@ class Main():
 
         elif not self.sampler.is_purged:
             # Return Error Message to Purge System
+            print("System requires purging. Sending 'Sample' Error Message to Web GUI")
             result = SampleResult(
                 capacities=self.sampler.volume,
                 success=False,
@@ -191,6 +193,7 @@ class Main():
             # Sampler Requires Purging
             self.sampler.is_purged = False
 
+            print("Sending 'Sample' Success Message to Web GUI")
             result = SampleResult(
                 capacities=self.sampler.volume,
                 success=True,
@@ -210,6 +213,7 @@ class Main():
         """
         if self.sampler.state['pump']:
             # Pump is already running: not idle
+            print("System is not idle. Sending 'Purge' Error Message to Web GUI")
             result = PurgeResult(
                 success=False,
                 message='System is not idle. Please wait for the pump to stop.'
@@ -256,6 +260,7 @@ class Main():
             self.sampler.setPurged(True)
 
             # Return Message if successful
+            print("Sending 'Purge' Success Message to Web GUI")
             if success:
                 result = PurgeResult(
                     success=True,
@@ -284,6 +289,7 @@ class Main():
         self.rate.sleep()
 
         # Return Message
+        print("Sending 'Stop' Success Message to Web GUI")
         result = StopResult(
             success=True,
             message='Pump & Valves stopped successfully'
@@ -299,6 +305,7 @@ class Main():
         self.rate.sleep()
 
         # Return Message
+        print("Sending 'Set Pump' Success Message to Web GUI")
         result = SetPumpResult(
             success=True,
             message='Pump state changed to ' + str(goal.state) + ' successfully'
@@ -326,6 +333,7 @@ class Main():
             self.valve7_pub.publish(goal.state)
 
         # Return Message
+        print("Sending 'Set Valve' Success Message to Web GUI")
         result = SetValveResult(
             success=True,
             message='Valve ' + str(goal.id) + ' state changed to ' + str(goal.state) + ' successfully'
