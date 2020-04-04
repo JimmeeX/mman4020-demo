@@ -26,10 +26,10 @@ import time
 
 SLEEP_RATE = 3 # Hz (ie, 3 times/second)
 
-PURGE_DURATION = 30 # Seconds
+PURGE_DURATION = 5 # Seconds
 NUM_JARS = 6
 NUM_VALVES = 7
-JAR_CAPACITIES = [90] * NUM_JARS # Max Volume (mL)
+JAR_CAPACITIES = [90.0] * NUM_JARS # Max Volume (mL)
 
 class Main():
     def __init__(self):
@@ -113,7 +113,8 @@ class Main():
 
     """CLASS SERVER-SIDE FUNCTIONS"""
     def exec_sample(self, goal):
-        print("Received Message to Execute 'Sample'")
+        num_jars = goal.jars.count(True)
+        print("Received Message to Execute 'Sample' on " + str(num_jars) + " jars")
         """
         1. Check if system is idle
         2. Warn if system is not purged yet
@@ -125,6 +126,7 @@ class Main():
         5. When a jar is 'filled', close the valve
         6. When all jars are filled, stop the process
         """
+
         if self.sampler.state['pump']:
             # Return Error Message to Wait
             print("System is not idle. Sending 'Sample' Error Message to Web GUI")
@@ -145,9 +147,18 @@ class Main():
             )
             self.action_servers['sample'].set_aborted(result)
 
+        elif num_jars == 0:
+            # Return Error Message to Purge System
+            print("No Jars Selected. Sending 'Sample' Error Message to Web GUI")
+            result = SampleResult(
+                capacities=self.sampler.volume,
+                success=False,
+                message='No Jars Selected.'
+            )
+            self.action_servers['sample'].set_aborted(result)
+
         else:
             # Run Sampling Operation
-
             # Set jar valves
             for i, value in enumerate(goal.jars):
                 if value: self.valve_pub[i].publish(True)
@@ -163,7 +174,7 @@ class Main():
             self.rate.sleep()
 
             # Pump Water until full
-            while not self.sampler.isFull(goal.jars):
+            while not self.sampler.isFull(goal.jars) and not rospy.is_shutdown():
                 dt = 1.0 / SLEEP_RATE # second elapsed
                 eta = self.sampler.addVolume(goal.jars, dt)
 
@@ -197,7 +208,7 @@ class Main():
             result = SampleResult(
                 capacities=self.sampler.volume,
                 success=True,
-                message='Successfully filled ' + str(goal.jars.count(True)) + ' jars.'
+                message='Successfully filled ' + str(num_jars) + ' jars.'
             )
             self.action_servers['sample'].set_succeeded(result)
 
@@ -235,7 +246,7 @@ class Main():
             # Wait 30 Seconds
             feedback = PurgeFeedback()
             counter = 0
-            while counter < PURGE_DURATION * SLEEP_RATE:
+            while counter < PURGE_DURATION * SLEEP_RATE and not rospy.is_shutdown():
                 # Check Cancel Request
                 if self.action_servers['purge'].is_preempt_requested():
                     # TODO: For some reason, sending cancel() does not set is_preempt_requested() to true...

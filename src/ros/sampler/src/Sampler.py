@@ -36,28 +36,30 @@ class Sampler():
         self.water_depth = []
 
     def isFull(self, ids):
-        for id in ids:
-            if id and not (self.capacities[id] == self.volume[id]): return False
-        return True
+        return self.numJarsLeft(ids) == 0
+
+    def numJarsLeft(self, ids):
+        count = 0
+        for idx, val in enumerate(ids):
+            if val and not np.isclose(self.capacities[idx], self.volume[idx], rtol=1e-05, atol=1e-08, equal_nan=False):
+                count += 1
+        return count
 
     def addVolume(self, ids, dt):
+        num_jars = self.numJarsLeft(ids)
         if self.state['pump'] and len(self.flow_rate) > 0 and self.flow_rate[-1] > FLOW_THRESHOLD:
             # Get Total Volume
             volume = dt * max(self.flow_rate[-1], 0)
-            print(self.flow_rate)
-            print(dt)
             # Distribute Amongst Ids (valves which are full should be ignored & closed)
             for idx, val in enumerate(ids):
                 if val:
-                    curr_volume = np.random.normal(volume, STD_SAMPLE)
-                    print(curr_volume)
+                    curr_volume = np.random.normal(volume / float(num_jars), STD_SAMPLE)
                     self.volume[idx] = min(self.capacities[idx], self.volume[idx] + curr_volume)
 
         # Calculate Eta based on remaining volume && flow_rate
         volume_remaining = 0
         for idx, val in enumerate(ids):
             if val: volume_remaining += (self.capacities[idx] - self.volume[idx])
-        print(volume_remaining)
 
         # Calculate Eta
         eta = volume_remaining // max(self.flow_rate[-1],1) # Prevent Division by 0
