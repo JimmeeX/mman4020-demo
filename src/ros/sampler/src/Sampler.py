@@ -1,5 +1,10 @@
+import numpy as np
+
 # Stores Current Information about the Water Sampler
 HISTORY_SIZE = 5
+
+STD_SAMPLE = 0.2
+FLOW_THRESHOLD = 1.0
 
 class Sampler():
     def __init__(self, capacities):
@@ -30,14 +35,34 @@ class Sampler():
         self.temperature = []
         self.water_depth = []
 
+    def isFull(self, ids):
+        for id in ids:
+            if id and not (self.capacities[id] == self.volume[id]): return False
+        return True
+
     def addVolume(self, ids, dt):
-        # TODO
-        if self.state['pump'] and len(self.flow_rate) > 0:
+        if self.state['pump'] and len(self.flow_rate) > 0 and self.flow_rate[-1] > FLOW_THRESHOLD:
             # Get Total Volume
             volume = dt * max(self.flow_rate[-1], 0)
-
+            print(self.flow_rate)
+            print(dt)
             # Distribute Amongst Ids (valves which are full should be ignored & closed)
-            # splitVolume = 
+            for idx, val in enumerate(ids):
+                if val:
+                    curr_volume = np.random.normal(volume, STD_SAMPLE)
+                    print(curr_volume)
+                    self.volume[idx] = min(self.capacities[idx], self.volume[idx] + curr_volume)
+
+        # Calculate Eta based on remaining volume && flow_rate
+        volume_remaining = 0
+        for idx, val in enumerate(ids):
+            if val: volume_remaining += (self.capacities[idx] - self.volume[idx])
+        print(volume_remaining)
+
+        # Calculate Eta
+        eta = volume_remaining // max(self.flow_rate[-1],1) # Prevent Division by 0
+        return eta
+
 
     def setState(self, key, value):
         self.state[key] = value

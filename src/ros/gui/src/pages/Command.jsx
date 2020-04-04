@@ -51,6 +51,8 @@ const Command = props => {
     purge: false,
     stop: false
   });
+  const [sampleETA, setSampleETA] = useState(null);
+  const [purgeETA, setPurgeETA] = useState(null);
 
   const handleSample = () => {
     setDisabled({ ...disabled, sample: true, purge: true });
@@ -63,9 +65,7 @@ const Command = props => {
     });
 
     sampleGoal.on('feedback', feedback => {
-      // TODO
-      console.log(feedback.capacities);
-      console.log(feedback.eta);
+      setSampleETA(feedback.eta);
     });
 
     sampleGoal.on('result', result => {
@@ -75,6 +75,7 @@ const Command = props => {
         toast.error(result.message);
       }
       setDisabled({ ...disabled, sample: false, purge: false });
+      setSampleETA(null);
     });
 
     sampleGoal.send();
@@ -89,7 +90,7 @@ const Command = props => {
     });
 
     purgeGoal.on('feedback', feedback => {
-      console.log(feedback.eta);
+      setPurgeETA(feedback.eta);
     });
 
     purgeGoal.on('result', result => {
@@ -99,6 +100,7 @@ const Command = props => {
         toast.error(result.message);
       }
       setDisabled({ ...disabled, sample: false, purge: false });
+      setPurgeETA(null);
     });
 
     purgeGoal.send();
@@ -184,7 +186,10 @@ const Command = props => {
           {
             id: 'button-sample',
             key: 1,
-            text: 'Start Sampling',
+            text:
+              disabled.sample && sampleETA
+                ? `Sampling... (${sampleETA})`
+                : 'Start Sampling',
             large: true,
             color: 'blue',
             disabled: disabled.sample,
@@ -219,7 +224,10 @@ const Command = props => {
           {
             id: 'button-purge',
             key: 2,
-            text: 'Purge Pump',
+            text:
+              disabled.purge && purgeETA
+                ? `Purging... (${purgeETA})`
+                : 'Purge Pump',
             large: true,
             color: 'blue',
             disabled: disabled.purge,

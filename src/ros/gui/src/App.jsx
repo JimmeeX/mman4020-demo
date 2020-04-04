@@ -14,7 +14,9 @@ const componentNames = [
   'valve4',
   'valve5',
   'valve6',
-  'valve7'
+  'valve7',
+  'flow',
+  'depth'
 ];
 
 const ros = new ROSLIB.Ros({
@@ -28,15 +30,17 @@ componentNames.map(name => {
   rosTopics[name] = new ROSLIB.Topic({
     ros: ros,
     name: `/arduino/${name}`,
-    messageType: 'std_msgs/Bool'
+    messageType: ['flow', 'depth'].includes(name)
+      ? 'std_msgs/Float32'
+      : 'std_msgs/Bool'
   });
   return null;
 });
 
 const App = () => {
   const [rosState, setRosState] = useState(false);
-  const [baro, setBaro] = useState(false);
-  const [flow, setFlow] = useState(false);
+  const [baro, setBaro] = useState(null);
+  const [flow, setFlow] = useState(null);
   const [pump, setPump] = useState(false);
   const [valve1, setValve1] = useState(false);
   const [valve2, setValve2] = useState(false);
@@ -91,6 +95,12 @@ const App = () => {
           case 'valve7':
             setValve7(msg.data);
             break;
+          case 'flow':
+            setFlow(msg.data);
+            break;
+          case 'depth':
+            setBaro(msg.data);
+            break;
           default:
             break;
         }
@@ -116,7 +126,7 @@ const App = () => {
   return (
     <div id='app'>
       <Command ros={ros} state={state} />
-      <Data />
+      <Data state={state} />
       <Diagram />
       <Status state={state} />
     </div>
