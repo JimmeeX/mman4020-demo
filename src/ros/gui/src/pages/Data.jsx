@@ -34,16 +34,16 @@ dataTopics.map(name => {
 
 const maxVolume = 90;
 
-const Data = () => {
+const Data = props => {
+  const { flow, depth } = props.state;
+
   const [jar1, setJar1] = useState(0);
   const [jar2, setJar2] = useState(0);
   const [jar3, setJar3] = useState(0);
   const [jar4, setJar4] = useState(0);
   const [jar5, setJar5] = useState(0);
   const [jar6, setJar6] = useState(0);
-  const [flow, setFlow] = useState(null);
   const [temp, setTemp] = useState(null);
-  const [depth, setDepth] = useState(null);
 
   // Reason for this Bloated Form is to prevent re-subscription to ROS Topic (since the callback variables stay the same).
   // I can't think of a better solution for the time being
@@ -70,14 +70,8 @@ const Data = () => {
           case 'jar6':
             setJar6(msg.data);
             break;
-          case 'flow':
-            setFlow(msg.data);
-            break;
           case 'temp':
             setTemp(msg.data);
-            break;
-          case 'depth':
-            setDepth(msg.data);
             break;
           default:
             break;
@@ -151,15 +145,15 @@ const Data = () => {
       <div id='data-info'>
         <div id='data-info__depth' className='data-info__container'>
           <h2>Water Depth</h2>
-          <p>{depth ? `${depth} metres` : 'N/A'}</p>
+          <p>{depth ? `${Math.round(depth * 100) / 100} metres` : 'N/A'}</p>
         </div>
         <div id='data-info__temperature' className='data-info__container'>
           <h2>Temperature</h2>
-          <p>{temp ? `${temp} °C` : 'N/A'}</p>
+          <p>{temp ? `${Math.round(temp * 100) / 100} °C` : 'N/A'}</p>
         </div>
         <div id='data-info__flow' className='data-info__container'>
           <h2>Flow Rate</h2>
-          <p>{flow ? `${flow} mL/min` : 'N/A'}</p>
+          <p>{flow ? `${Math.round(flow * 100) / 100} mL/sec` : 'N/A'}</p>
         </div>
       </div>
     </div>

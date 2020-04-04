@@ -15,15 +15,15 @@ const Status = props => {
       id: 2,
       name: 'Barometric Sensor',
       type: 'sensor',
-      connection: state.baro,
-      state: state.baro
+      connection: !!state.baro,
+      state: !!state.baro
     },
     {
       id: 3,
       name: 'Flow Rate Sensor',
       type: 'sensor',
-      connection: state.flow,
-      state: state.flow
+      connection: !!state.flow,
+      state: !!state.flow
     },
     { id: 4, name: 'Pump', type: 'pump', connection: null, state: state.pump },
     {

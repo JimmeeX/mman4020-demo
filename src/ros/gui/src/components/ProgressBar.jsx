@@ -21,7 +21,7 @@ const ProgressBar = props => {
         />
       </div>
       <p className='progress-bar__text'>
-        {current}/{max} {units}
+        {Math.round(current * 100) / 100}/{max} {units}
       </p>
     </div>
   );

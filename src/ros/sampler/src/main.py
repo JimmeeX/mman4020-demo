@@ -42,6 +42,7 @@ class Main():
 
         """Initialise Publishers"""
         # Arduino Control Panel
+        self.pump_pub = rospy.Publisher("/arduino/pump", Bool, queue_size=1)
         self.valve1_pub = rospy.Publisher("/arduino/valve1", Bool, queue_size=1) # Jar 1
         self.valve2_pub = rospy.Publisher("/arduino/valve2", Bool, queue_size=1) # Jar 2
         self.valve3_pub = rospy.Publisher("/arduino/valve3", Bool, queue_size=1) # Jar 3
@@ -49,7 +50,15 @@ class Main():
         self.valve5_pub = rospy.Publisher("/arduino/valve5", Bool, queue_size=1) # Jar 5
         self.valve6_pub = rospy.Publisher("/arduino/valve6", Bool, queue_size=1) # Jar 6
         self.valve7_pub = rospy.Publisher("/arduino/valve7", Bool, queue_size=1) # Purge
-        self.pump_pub = rospy.Publisher("/arduino/pump", Bool, queue_size=1)
+        self.valve_pub = [
+            self.valve1_pub,
+            self.valve2_pub,
+            self.valve3_pub,
+            self.valve4_pub,
+            self.valve5_pub,
+            self.valve6_pub,
+            self.valve7_pub
+        ]
 
         # Jar Volumes
         self.jar1_pub = rospy.Publisher("/volume/jar1", Float32, queue_size=1)
@@ -58,6 +67,14 @@ class Main():
         self.jar4_pub = rospy.Publisher("/volume/jar4", Float32, queue_size=1)
         self.jar5_pub = rospy.Publisher("/volume/jar5", Float32, queue_size=1)
         self.jar6_pub = rospy.Publisher("/volume/jar6", Float32, queue_size=1)
+        self.jar_pub = [
+            self.jar1_pub,
+            self.jar2_pub,
+            self.jar3_pub,
+            self.jar4_pub,
+            self.jar5_pub,
+            self.jar6_pub,
+        ]
 
         """Initialise Subscribers"""
         # Components
@@ -98,7 +115,6 @@ class Main():
     def exec_sample(self, goal):
         print("Received Message to Execute 'Sample' on " + str(goal.jars))
         """
-        # TODO
         1. Check if system is idle
         2. Warn if system is not purged yet
         2. Open Specified Jar Valves. Ensure rest of valves are closed.
@@ -130,16 +146,55 @@ class Main():
         else:
             # Run Sampling Operation
 
-            # Initialise Variables
-
-            # Open specified jar valves
+            # Set jar valves
             for i, value in enumerate(goal.jars):
-                print(i, value)
+                if value: self.valve_pub[i].publish(True)
+                else: self.valve_pub[i].publish(False)
+                self.rate.sleep()
+
+            # Close Purge Valve
+            self.valve_pub[6].publish(False)
+            self.rate.sleep()
+
+            # Start Pump
+            self.pump_pub.publish(True)
+            self.rate.sleep()
+
+            # Pump Water until full
+            while not self.sampler.isFull(goal.jars):
+                dt = 1.0 / SLEEP_RATE # second elapsed
+                eta = self.sampler.addVolume(goal.jars, dt)
+
+                # Publish Jar Capacities
+                for idx, volume in enumerate(self.sampler.volume):
+                    self.jar_pub[idx].publish(volume)
+
+                # Publish Feedback
+                feedback = SampleFeedback(
+                    capacities=self.sampler.volume,
+                    eta=eta
+                )
+                self.action_servers['sample'].publish_feedback(feedback)
+
+                self.rate.sleep()
+
+            # Turn off Pump
+            self.pump_pub.publish(False)
+            self.rate.sleep()
+
+            # Close Valves
+            for i, value in enumerate(goal.jars):
+                if value:
+                    self.valve_pub[i].publish(False)
+                    self.rate.sleep()
+
+            # Sampler Requires Purging
+            self.sampler.is_purged = False
 
             result = SampleResult(
                 capacities=self.sampler.volume,
                 success=True,
-                message='Successfully filled ' + str(len(goal.jars)) + ' jars.'
+                message='Successfully filled ' + str(goal.jars.count(True)) + ' jars.'
             )
             self.action_servers['sample'].set_succeeded(result)
 
@@ -163,7 +218,7 @@ class Main():
         else:
             success = True
             # Close Jar Valves
-            self.set_jar_valves(False)
+            self.set_all_jar_valves(False)
 
             # Open Purge Valve
             self.valve7_pub.publish(True)
@@ -222,7 +277,7 @@ class Main():
         self.rate.sleep()
 
         # Close Jar Valves
-        self.set_jar_valves(False)
+        self.set_all_jar_valves(False)
 
         # Close Purge Valve
         self.valve7_pub.publish(False)
@@ -295,7 +350,7 @@ class Main():
         self.sampler.processDepth(msg.data)
 
     """CLASS UTILITY FUNCTIONS"""
-    def set_jar_valves(self, value):
+    def set_all_jar_valves(self, value):
         # Sleep (3hz) maybe so electronics doesn't do everything at once?
         self.valve1_pub.publish(value)
         self.rate.sleep()
