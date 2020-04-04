@@ -96,8 +96,7 @@ class Main():
 
     """CLASS SERVER-SIDE FUNCTIONS"""
     def exec_sample(self, goal):
-        print("Execute Sample")
-        print(goal.jars) # List of Boolean of Size 6
+        print("Received Message to Execute 'Sample' on " + str(goal.jars))
         """
         # TODO
         1. Check if system is idle
@@ -110,6 +109,40 @@ class Main():
         5. When a jar is 'filled', close the valve
         6. When all jars are filled, stop the process
         """
+        if self.sampler.state['pump']:
+            # Return Error Message to Wait
+            result = SampleResult(
+                capacities=self.sampler.volume,
+                success=False,
+                message='System is not idle. Please wait for the pump to stop.'
+            )
+            self.action_servers['sample'].set_aborted(result)
+
+        elif not self.sampler.is_purged:
+            # Return Error Message to Purge System
+            result = SampleResult(
+                capacities=self.sampler.volume,
+                success=False,
+                message='System requires purging.'
+            )
+            self.action_servers['sample'].set_aborted(result)
+
+        else:
+            # Run Sampling Operation
+
+            # Initialise Variables
+
+            # Open specified jar valves
+            for i, value in enumerate(goal.jars):
+                print(i, value)
+
+            result = SampleResult(
+                capacities=self.sampler.volume,
+                success=True,
+                message='Successfully filled ' + str(len(goal.jars)) + ' jars.'
+            )
+            self.action_servers['sample'].set_succeeded(result)
+
 
 
     def exec_purge(self, goal):
@@ -145,8 +178,6 @@ class Main():
             counter = 0
             while counter < PURGE_DURATION * SLEEP_RATE:
                 # Check Cancel Request
-                print(vars(self.action_servers['purge']))
-
                 if self.action_servers['purge'].is_preempt_requested():
                     # TODO: For some reason, sending cancel() does not set is_preempt_requested() to true...
                     print("Received request to cancel 'Purge'")

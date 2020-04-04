@@ -17,11 +17,11 @@ const componentNames = [
   'valve7'
 ];
 
-const rosTopics = {};
-
 const ros = new ROSLIB.Ros({
   url: 'ws://localhost:9090'
 });
+
+const rosTopics = {};
 
 componentNames.map(name => {
   // Get Topic
@@ -34,58 +34,96 @@ componentNames.map(name => {
 });
 
 const App = () => {
-  const [state, setState] = useState({
-    ros: false,
-    baro: false,
-    flow: false,
-    pump: false,
-    valve1: false,
-    valve2: false,
-    valve3: false,
-    valve4: false,
-    valve5: false,
-    valve6: false,
-    valve7: false
-  });
+  const [rosState, setRosState] = useState(false);
+  const [baro, setBaro] = useState(false);
+  const [flow, setFlow] = useState(false);
+  const [pump, setPump] = useState(false);
+  const [valve1, setValve1] = useState(false);
+  const [valve2, setValve2] = useState(false);
+  const [valve3, setValve3] = useState(false);
+  const [valve4, setValve4] = useState(false);
+  const [valve5, setValve5] = useState(false);
+  const [valve6, setValve6] = useState(false);
+  const [valve7, setValve7] = useState(false);
 
   useEffect(() => {
     // Check ROS Connection
     ros.on('connection', () => {
       if (!state.ros) {
         console.log('Established Connection with ROS');
-        setState({ ...state, ros: true });
+        setRosState(true);
       }
     });
 
     ros.on('error', error => {
       if (state.ros) {
         console.log(`Connection Error: ${error}`);
-        setState({ ...state, ros: false });
+        setRosState(false);
       }
     });
 
     ros.on('close', () => {
       if (state.ros) {
         console.log('Closed Connection with ROS');
-        setState({ ...state, ros: false });
+        setRosState(false);
       }
     });
-  });
 
-  componentNames.map(name => {
-    // Subscribe
-    rosTopics[name].subscribe(msg => {
-      if (state[name] !== msg.data) {
-        setState({ ...state, [name]: msg.data });
-      }
+    // Initialise Subscribers
+    componentNames.map(name => {
+      rosTopics[name].subscribe(msg => {
+        switch (name) {
+          case 'pump':
+            setPump(msg.data);
+            break;
+          case 'valve1':
+            setValve1(msg.data);
+            break;
+          case 'valve2':
+            setValve2(msg.data);
+            break;
+          case 'valve3':
+            setValve3(msg.data);
+            break;
+          case 'valve4':
+            setValve4(msg.data);
+            break;
+          case 'valve5':
+            setValve5(msg.data);
+            break;
+          case 'valve6':
+            setValve6(msg.data);
+            break;
+          case 'valve7':
+            setValve7(msg.data);
+            break;
+          default:
+            break;
+        }
+      });
     });
-    return null;
-  });
+  }, []);
+
+  const state = {
+    ros: rosState,
+    baro,
+    flow,
+    pump,
+    valve1,
+    valve2,
+    valve3,
+    valve4,
+    valve5,
+    valve6,
+    valve7
+  };
+
+  console.log(state);
 
   return (
     <div id='app'>
       <Command ros={ros} state={state} />
-      <Data ros={ros} />
+      <Data />
       <Diagram />
       <Status state={state} />
     </div>
