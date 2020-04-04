@@ -37,9 +37,9 @@ const App = () => {
   const [state, setState] = useState({
     ros: false,
     baro: false,
-    flow: true,
-    pump: true,
-    valve1: true,
+    flow: false,
+    pump: false,
+    valve1: false,
     valve2: false,
     valve3: false,
     valve4: false,

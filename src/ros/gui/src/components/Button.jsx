@@ -2,12 +2,13 @@ import React from 'react';
 import cx from 'classnames';
 
 const Button = props => {
-  const { id, color, large, style } = props;
+  const { id, color, large, style, disabled } = props;
 
   const className = cx('button', {
     large: large,
     red: color === 'red',
-    blue: color !== 'red'
+    blue: color !== 'red',
+    disabled: disabled
   });
 
   return (

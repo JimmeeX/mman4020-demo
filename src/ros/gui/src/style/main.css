@@ -100,9 +100,9 @@ body {
 #command {
   display: -ms-grid;
   display: grid;
-  -ms-grid-rows: 50px 75px auto;
-      grid-template-rows: 50px 75px auto;
-      grid-template-areas: 'command-title' 'command-nav' 'command-buttons';
+  -ms-grid-rows: 50px 75px auto 0px;
+      grid-template-rows: 50px 75px auto 0px;
+      grid-template-areas: 'command-title' 'command-nav' 'command-buttons' '.';
 }
 
 #command h2 {
@@ -325,6 +325,11 @@ body {
 .button.red {
   background-color: #722424;
   border: 2px solid #ff0000;
+}
+
+.button.disabled {
+  -webkit-filter: saturate(0);
+          filter: saturate(0);
 }
 
 .progress-bar {
