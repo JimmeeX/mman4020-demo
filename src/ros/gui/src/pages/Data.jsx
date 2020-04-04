@@ -35,18 +35,6 @@ dataTopics.map(name => {
 const maxVolume = 90;
 
 const Data = () => {
-  // const [state, setState] = useState({
-  //   jar1: 0,
-  //   jar2: 0,
-  //   jar3: 0,
-  //   jar4: 0,
-  //   jar5: 0,
-  //   jar6: 0,
-  //   flow: null,
-  //   temp: null,
-  //   depth: null
-  // });
-
   const [jar1, setJar1] = useState(0);
   const [jar2, setJar2] = useState(0);
   const [jar3, setJar3] = useState(0);
@@ -65,31 +53,31 @@ const Data = () => {
       rosTopics[shortName].subscribe(msg => {
         switch (shortName) {
           case 'jar1':
-            if (jar1 !== msg.data) setJar1(msg.data);
+            setJar1(msg.data);
             break;
           case 'jar2':
-            if (jar2 !== msg.data) setJar2(msg.data);
+            setJar2(msg.data);
             break;
           case 'jar3':
-            if (jar3 !== msg.data) setJar3(msg.data);
+            setJar3(msg.data);
             break;
           case 'jar4':
-            if (jar4 !== msg.data) setJar4(msg.data);
+            setJar4(msg.data);
             break;
           case 'jar5':
-            if (jar5 !== msg.data) setJar5(msg.data);
+            setJar5(msg.data);
             break;
           case 'jar6':
-            if (jar6 !== msg.data) setJar6(msg.data);
+            setJar6(msg.data);
             break;
           case 'flow':
-            if (flow !== msg.data) setFlow(msg.data);
+            setFlow(msg.data);
             break;
           case 'temp':
-            if (temp !== msg.data) setTemp(msg.data);
+            setTemp(msg.data);
             break;
           case 'depth':
-            if (depth !== msg.data) setDepth(msg.data);
+            setDepth(msg.data);
             break;
           default:
             break;
@@ -97,17 +85,6 @@ const Data = () => {
       });
     });
   }, []);
-
-  // dataTopics.map(name => {
-  //   // Subscribe
-  //   const shortName = name.split('/')[2];
-  //   rosTopics[shortName].subscribe(msg => {
-  //     if (state[shortName] !== msg.data) {
-  //       setState({ ...state, [name]: msg.data });
-  //     }
-  //   });
-  //   return null;
-  // });
 
   const jars = [
     {

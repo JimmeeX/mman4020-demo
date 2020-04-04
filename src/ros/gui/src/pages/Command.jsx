@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import ROSLIB from 'roslib';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -7,11 +7,42 @@ import Modal from '../components/Modal';
 import Nav from '../components/Nav';
 
 const numJars = 6;
-
 const changeStateTimeout = 10000;
 
+const ros = new ROSLIB.Ros({
+  url: 'ws://localhost:9090'
+});
+
+// Initialise ActionClients & Action Goals
+// Initialise ROS Action Clients
+
+const serverActionNames = [
+  { serverName: 'sample', actionName: 'sampler/SampleAction' },
+  { serverName: 'purge', actionName: 'sampler/PurgeAction' },
+  { serverName: 'stop', actionName: 'sampler/StopAction' },
+  { serverName: 'pump', actionName: 'sampler/SetPumpAction' },
+  { serverName: 'valve1', actionName: 'sampler/SetValveAction' },
+  { serverName: 'valve2', actionName: 'sampler/SetValveAction' },
+  { serverName: 'valve3', actionName: 'sampler/SetValveAction' },
+  { serverName: 'valve4', actionName: 'sampler/SetValveAction' },
+  { serverName: 'valve5', actionName: 'sampler/SetValveAction' },
+  { serverName: 'valve6', actionName: 'sampler/SetValveAction' },
+  { serverName: 'valve7', actionName: 'sampler/SetValveAction' }
+];
+
+const actionClients = {};
+serverActionNames.map(({ serverName, actionName }) => {
+  actionClients[serverName] = new ROSLIB.ActionClient({
+    ros: ros,
+    serverName: `/${serverName}`,
+    actionName: actionName
+  });
+
+  return null;
+});
+
 const Command = props => {
-  const { ros, state } = props;
+  const { state } = props;
 
   const [active, setActive] = useState('auto');
   const [sampleChoice, setSampleChoice] = useState(Array(numJars).fill(false));
@@ -21,47 +52,9 @@ const Command = props => {
     stop: false
   });
 
-  // Initialise ROS Action Clients
-  const actionClients = {};
-  const actionGoals = {};
-
-  const serverActionNames = [
-    { serverName: 'sample', actionName: 'sampler/SampleAction' },
-    { serverName: 'purge', actionName: 'sampler/PurgeAction' },
-    { serverName: 'stop', actionName: 'sampler/StopAction' },
-    { serverName: 'pump', actionName: 'sampler/SetPumpAction' },
-    { serverName: 'valve1', actionName: 'sampler/SetValveAction' },
-    { serverName: 'valve2', actionName: 'sampler/SetValveAction' },
-    { serverName: 'valve3', actionName: 'sampler/SetValveAction' },
-    { serverName: 'valve4', actionName: 'sampler/SetValveAction' },
-    { serverName: 'valve5', actionName: 'sampler/SetValveAction' },
-    { serverName: 'valve6', actionName: 'sampler/SetValveAction' },
-    { serverName: 'valve7', actionName: 'sampler/SetValveAction' }
-  ];
-
-  serverActionNames.map(({ serverName, actionName }) => {
-    actionClients[serverName] = new ROSLIB.ActionClient({
-      ros: ros,
-      serverName: `/${serverName}`,
-      actionName: actionName
-    });
-
-    const actionClient = new ROSLIB.ActionClient({
-      ros: ros,
-      serverName: `/${serverName}`,
-      actionName: actionName
-    });
-
-    actionGoals[serverName] = new ROSLIB.Goal({
-      actionClient: actionClient,
-      goalMessage: {}
-    });
-    return null;
-  });
-
   const handleSample = () => {
     setDisabled({ ...disabled, sample: true, purge: true });
-    // actionGoals['sample'].goalMessage =
+
     const sampleGoal = new ROSLIB.Goal({
       actionClient: actionClients['sample'],
       goalMessage: {
@@ -95,11 +88,11 @@ const Command = props => {
       goalMessage: {}
     });
 
-    actionGoals['purge'].on('feedback', feedback => {
+    purgeGoal.on('feedback', feedback => {
       console.log(feedback.eta);
     });
 
-    actionGoals['purge'].on('result', result => {
+    purgeGoal.on('result', result => {
       if (result.success) {
         toast.success(result.message);
       } else {
@@ -108,7 +101,7 @@ const Command = props => {
       setDisabled({ ...disabled, sample: false, purge: false });
     });
 
-    actionGoals['purge'].send();
+    purgeGoal.send();
     toast.info("Sent 'purge' message to drone.");
   };
 
@@ -119,7 +112,7 @@ const Command = props => {
       goalMessage: {}
     });
 
-    actionGoals['stop'].on('result', result => {
+    stopGoal.on('result', result => {
       if (result.success) {
         toast.success(result.message);
       } else {
@@ -128,28 +121,27 @@ const Command = props => {
       setDisabled({ pump: false, purge: false, stop: false });
     });
 
-    actionGoals['stop'].on('timeout', () => {
+    stopGoal.on('timeout', () => {
       // Send Request to Stop
       toast.error('Stop request timed out');
       stopGoal.cancel();
     });
 
-    actionGoals['stop'].send(changeStateTimeout);
-    // actionGoals['purge'].send();
-    actionGoals['purge'].cancel();
-    actionGoals['sample'].cancel();
+    stopGoal.send(changeStateTimeout);
+    // purgeGoal.cancel();
+    // sampleGoal.cancel();
     toast.info("Sent 'stop' message to drone.");
   };
 
   const handleSetPump = newState => {
-    const setPumpGoal = new ROSLIB.Goal({
+    const pumpGoal = new ROSLIB.Goal({
       actionClient: actionClients['pump'],
       goalMessage: {
         state: newState
       }
     });
 
-    setPumpGoal.on('result', result => {
+    pumpGoal.on('result', result => {
       if (result.success) {
         toast.success(result.message);
       } else {
@@ -157,14 +149,14 @@ const Command = props => {
       }
     });
 
-    setPumpGoal.send(changeStateTimeout);
+    pumpGoal.send(changeStateTimeout);
     toast.info(
       `Sent 'set pump to ${newState ? 'on' : 'off'}' message to drone.`
     );
   };
 
   const handleSetValve = (id, newState) => {
-    const setValveGoal = new ROSLIB.Goal({
+    const valveGoal = new ROSLIB.Goal({
       actionClient: actionClients[`valve${id}`],
       goalMessage: {
         id: id,
@@ -172,7 +164,7 @@ const Command = props => {
       }
     });
 
-    setValveGoal.on('result', result => {
+    valveGoal.on('result', result => {
       if (result.success) {
         toast.success(result.message);
       } else {
@@ -180,7 +172,7 @@ const Command = props => {
       }
     });
 
-    setValveGoal.send(changeStateTimeout);
+    valveGoal.send(changeStateTimeout);
     toast.info(
       `Sent 'set valve ${id} to ${newState ? 'on' : 'off'}' message to drone.`
     );
