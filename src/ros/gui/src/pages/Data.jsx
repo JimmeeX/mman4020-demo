@@ -83,6 +83,7 @@ const Data = () => {
             break;
         }
       });
+      return null;
     });
   }, []);
 

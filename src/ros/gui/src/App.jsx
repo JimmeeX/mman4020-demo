@@ -49,24 +49,18 @@ const App = () => {
   useEffect(() => {
     // Check ROS Connection
     ros.on('connection', () => {
-      if (!state.ros) {
-        console.log('Established Connection with ROS');
-        setRosState(true);
-      }
+      console.log('Established Connection with ROS');
+      setRosState(true);
     });
 
     ros.on('error', error => {
-      if (state.ros) {
-        console.log(`Connection Error: ${error}`);
-        setRosState(false);
-      }
+      console.log(`Connection Error: ${error}`);
+      setRosState(false);
     });
 
     ros.on('close', () => {
-      if (state.ros) {
-        console.log('Closed Connection with ROS');
-        setRosState(false);
-      }
+      console.log('Closed Connection with ROS');
+      setRosState(false);
     });
 
     // Initialise Subscribers
@@ -101,8 +95,9 @@ const App = () => {
             break;
         }
       });
+      return null;
     });
-  }, []);
+  }, [rosState]);
 
   const state = {
     ros: rosState,
@@ -117,8 +112,6 @@ const App = () => {
     valve6,
     valve7
   };
-
-  console.log(state);
 
   return (
     <div id='app'>
