@@ -9,7 +9,7 @@ import time
 import sys
 import numpy as np
 
-from std_msgs.msg import Bool, Float32
+from std_msgs.msg import Bool, Float32, Float64
 
 SLEEP_RATE = 3
 
@@ -21,6 +21,8 @@ STD_TEMP = 0.05
 # Expected Values
 MU_FLOW = 380 / 60 # mL/sec
 MU_TEMP = 20
+
+TUBE_LENGTH = 7.5 # m
 
 class Simulate():
     def __init__(self):
@@ -35,6 +37,7 @@ class Simulate():
 
         # Initialise Subscribers
         self.pump_sub = rospy.Subscriber("/arduino/pump", Bool, self.handle_pump, queue_size=1)
+        self.alt_sub = rospy.Subscriber("/mavros/global_position/rel_alt", Float64, self.handle_alt, queue_size=1) # Requires SITL / Actual Drone
 
         self.expected_depth = -2
         self.rate = rospy.Rate(SLEEP_RATE)
@@ -58,6 +61,11 @@ class Simulate():
 
     def handle_pump(self, msg):
         self.pump = msg.data
+
+    def handle_alt(self, msg):
+        """Naive approximation of water depth by drone altitude - length of dangling tube"""
+        depth = np.random.normal(msg.data - TUBE_LENGTH, STD_DEPTH)
+        self.depth_pub.publish(depth)
 
 
 

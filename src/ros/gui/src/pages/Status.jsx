@@ -15,8 +15,8 @@ const Status = (props) => {
       id: 2,
       name: 'Barometer',
       type: 'sensor',
-      connection: !!state.baro,
-      state: !!state.baro,
+      connection: !!state.depth,
+      state: !!state.depth,
     },
     {
       id: 3,

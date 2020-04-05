@@ -5,12 +5,13 @@ HISTORY_SIZE = 5
 
 STD_SAMPLE = 0.2
 FLOW_THRESHOLD = 1.0
+DEPTH_THRESHOLD = 0.0
 
 class Sampler():
     def __init__(self, capacities):
 
         # Volume of 6 Jars
-        self.volume = [0] * len(capacities)
+        self.volume = [0.0] * len(capacities)
         self.capacities = capacities # Max Volume each jar can hold
 
         # State of Components & Sensors
@@ -47,7 +48,13 @@ class Sampler():
 
     def addVolume(self, ids, dt):
         num_jars = self.numJarsLeft(ids)
-        if self.state['pump'] and len(self.flow_rate) > 0 and self.flow_rate[-1] > FLOW_THRESHOLD:
+        """
+        Requirements:
+        - Pump is Running
+        - A measurable flow rate
+        - The tube is underwater
+        """
+        if self.state['pump'] and len(self.flow_rate) > 0 and self.flow_rate[-1] > FLOW_THRESHOLD and len(self.water_depth) > 0 and self.water_depth[-1] < DEPTH_THRESHOLD:
             # Get Total Volume
             volume = dt * max(self.flow_rate[-1], 0)
             # Distribute Amongst Ids (valves which are full should be ignored & closed)

@@ -26,7 +26,7 @@ import time
 
 SLEEP_RATE = 3 # Hz (ie, 3 times/second)
 
-PURGE_DURATION = 5 # Seconds
+PURGE_DURATION = 20 # Seconds
 NUM_JARS = 6
 NUM_VALVES = 7
 JAR_CAPACITIES = [90.0] * NUM_JARS # Max Volume (mL)

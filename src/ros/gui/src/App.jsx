@@ -16,30 +16,30 @@ const componentNames = [
   'valve6',
   'valve7',
   'flow',
-  'depth'
+  'depth',
 ];
 
 const ros = new ROSLIB.Ros({
-  url: 'ws://localhost:9090'
+  url: 'ws://localhost:9090',
 });
 
 const rosTopics = {};
 
-componentNames.map(name => {
+componentNames.map((name) => {
   // Get Topic
   rosTopics[name] = new ROSLIB.Topic({
     ros: ros,
     name: `/arduino/${name}`,
     messageType: ['flow', 'depth'].includes(name)
       ? 'std_msgs/Float32'
-      : 'std_msgs/Bool'
+      : 'std_msgs/Bool',
   });
   return null;
 });
 
 const App = () => {
   const [rosState, setRosState] = useState(false);
-  const [baro, setBaro] = useState(null);
+  const [depth, setDepth] = useState(null);
   const [flow, setFlow] = useState(null);
   const [pump, setPump] = useState(false);
   const [valve1, setValve1] = useState(false);
@@ -57,7 +57,7 @@ const App = () => {
       setRosState(true);
     });
 
-    ros.on('error', error => {
+    ros.on('error', (error) => {
       console.log(`Connection Error: ${error}`);
       setRosState(false);
     });
@@ -68,8 +68,8 @@ const App = () => {
     });
 
     // Initialise Subscribers
-    componentNames.map(name => {
-      rosTopics[name].subscribe(msg => {
+    componentNames.map((name) => {
+      rosTopics[name].subscribe((msg) => {
         switch (name) {
           case 'pump':
             setPump(msg.data);
@@ -99,7 +99,7 @@ const App = () => {
             setFlow(msg.data);
             break;
           case 'depth':
-            setBaro(msg.data);
+            setDepth(msg.data);
             break;
           default:
             break;
@@ -111,7 +111,7 @@ const App = () => {
 
   const state = {
     ros: rosState,
-    baro,
+    depth,
     flow,
     pump,
     valve1,
@@ -120,7 +120,7 @@ const App = () => {
     valve4,
     valve5,
     valve6,
-    valve7
+    valve7,
   };
 
   return (
