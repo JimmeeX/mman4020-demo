@@ -99,7 +99,7 @@ const App = () => {
             setFlow(msg.data);
             break;
           case 'depth':
-            setDepth(msg.data);
+            setDepth(-1 * msg.data);
             break;
           default:
             break;
