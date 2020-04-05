@@ -49,11 +49,13 @@ source source ~/catkin_ws/devel/setup.bash
 | -v    | Vehicle                                                      |
 | -L    | Location (defined in ardupilot/Tools/autotest/locations.txt) |
 
+Copy locations.txt in this repo (locations/locations.txt) to location in above table.
+
 ```shell
 sim_vehicle.py -v ArduCopter -L Delta
 ```
 
-2. Run ROS Launch File
+1. Run ROS Launch File
 
 This will
 
