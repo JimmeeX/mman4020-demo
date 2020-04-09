@@ -12,29 +12,29 @@ const dataTopics = [
   '/volume/jar6',
   '/arduino/flow',
   '/arduino/temp',
-  '/arduino/depth'
+  '/arduino/depth',
 ];
 
 const ros = new ROSLIB.Ros({
-  url: 'ws://localhost:9090'
+  url: 'ws://localhost:9090',
 });
 
 const rosTopics = {};
 
-dataTopics.map(name => {
+dataTopics.map((name) => {
   // Get Topic
   const shortName = name.split('/')[2];
   rosTopics[shortName] = new ROSLIB.Topic({
     ros: ros,
     name: name,
-    messageType: 'std_msgs/Float32'
+    messageType: 'std_msgs/Float32',
   });
   return null;
 });
 
-const maxVolume = 90;
+const maxVolume = 60;
 
-const Data = props => {
+const Data = (props) => {
   const { flow, depth } = props.state;
 
   const [jar1, setJar1] = useState(0);
@@ -48,9 +48,9 @@ const Data = props => {
   // Reason for this Bloated Form is to prevent re-subscription to ROS Topic (since the callback variables stay the same).
   // I can't think of a better solution for the time being
   useEffect(() => {
-    dataTopics.map(name => {
+    dataTopics.map((name) => {
       const shortName = name.split('/')[2];
-      rosTopics[shortName].subscribe(msg => {
+      rosTopics[shortName].subscribe((msg) => {
         switch (shortName) {
           case 'jar1':
             setJar1(msg.data);
@@ -88,7 +88,7 @@ const Data = props => {
       name: '1',
       current: jar1,
       max: maxVolume,
-      units: 'mL'
+      units: 'mL',
     },
     {
       id: 'jar-2',
@@ -96,7 +96,7 @@ const Data = props => {
       name: '2',
       current: jar2,
       max: maxVolume,
-      units: 'mL'
+      units: 'mL',
     },
     {
       id: 'jar-3',
@@ -104,7 +104,7 @@ const Data = props => {
       name: '3',
       current: jar3,
       max: maxVolume,
-      units: 'mL'
+      units: 'mL',
     },
     {
       id: 'jar-4',
@@ -112,7 +112,7 @@ const Data = props => {
       name: '4',
       current: jar4,
       max: maxVolume,
-      units: 'mL'
+      units: 'mL',
     },
     {
       id: 'jar-5',
@@ -120,7 +120,7 @@ const Data = props => {
       name: '5',
       current: jar5,
       max: maxVolume,
-      units: 'mL'
+      units: 'mL',
     },
     {
       id: 'jar-6',
@@ -128,8 +128,8 @@ const Data = props => {
       name: '6',
       current: jar6,
       max: maxVolume,
-      units: 'mL'
-    }
+      units: 'mL',
+    },
   ];
 
   return (
@@ -137,7 +137,7 @@ const Data = props => {
       <div id='data-capacities'>
         <h2 id='data-capacities__title'>Jar Capacities</h2>
         <div id='data-capacities__content'>
-          {jars.map(item => (
+          {jars.map((item) => (
             <ProgressBar {...item} />
           ))}
         </div>

@@ -26,10 +26,10 @@ import time
 
 SLEEP_RATE = 3 # Hz (ie, 3 times/second)
 
-PURGE_DURATION = 20 # Seconds
+PURGE_DURATION = 10 # Seconds
 NUM_JARS = 6
 NUM_VALVES = 7
-JAR_CAPACITIES = [90.0] * NUM_JARS # Max Volume (mL)
+JAR_CAPACITIES = [60.0] * NUM_JARS # Max Volume (mL)
 
 class Main():
     def __init__(self):

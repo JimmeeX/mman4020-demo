@@ -10,7 +10,7 @@ const numJars = 6;
 const changeStateTimeout = 10000;
 
 const ros = new ROSLIB.Ros({
-  url: 'ws://localhost:9090'
+  url: 'ws://localhost:9090',
 });
 
 // Initialise ActionClients & Action Goals
@@ -27,7 +27,7 @@ const serverActionNames = [
   { serverName: 'valve4', actionName: 'sampler/SetValveAction' },
   { serverName: 'valve5', actionName: 'sampler/SetValveAction' },
   { serverName: 'valve6', actionName: 'sampler/SetValveAction' },
-  { serverName: 'valve7', actionName: 'sampler/SetValveAction' }
+  { serverName: 'valve7', actionName: 'sampler/SetValveAction' },
 ];
 
 const actionClients = {};
@@ -35,13 +35,13 @@ serverActionNames.map(({ serverName, actionName }) => {
   actionClients[serverName] = new ROSLIB.ActionClient({
     ros: ros,
     serverName: `/${serverName}`,
-    actionName: actionName
+    actionName: actionName,
   });
 
   return null;
 });
 
-const Command = props => {
+const Command = (props) => {
   const { state } = props;
 
   const [active, setActive] = useState('auto');
@@ -49,7 +49,7 @@ const Command = props => {
   const [disabled, setDisabled] = useState({
     sample: false,
     purge: false,
-    stop: false
+    stop: false,
   });
   const [sampleETA, setSampleETA] = useState(null);
   const [purgeETA, setPurgeETA] = useState(null);
@@ -60,15 +60,15 @@ const Command = props => {
     const sampleGoal = new ROSLIB.Goal({
       actionClient: actionClients['sample'],
       goalMessage: {
-        jars: sampleChoice
-      }
+        jars: sampleChoice,
+      },
     });
 
-    sampleGoal.on('feedback', feedback => {
+    sampleGoal.on('feedback', (feedback) => {
       setSampleETA(feedback.eta);
     });
 
-    sampleGoal.on('result', result => {
+    sampleGoal.on('result', (result) => {
       if (result.success) {
         toast.success(result.message);
       } else {
@@ -86,14 +86,14 @@ const Command = props => {
     setDisabled({ ...disabled, sample: true, purge: true });
     const purgeGoal = new ROSLIB.Goal({
       actionClient: actionClients['purge'],
-      goalMessage: {}
+      goalMessage: {},
     });
 
-    purgeGoal.on('feedback', feedback => {
+    purgeGoal.on('feedback', (feedback) => {
       setPurgeETA(feedback.eta);
     });
 
-    purgeGoal.on('result', result => {
+    purgeGoal.on('result', (result) => {
       if (result.success) {
         toast.success(result.message);
       } else {
@@ -111,10 +111,10 @@ const Command = props => {
     setDisabled({ pump: true, purge: true, stop: true });
     const stopGoal = new ROSLIB.Goal({
       actionClient: actionClients['stop'],
-      goalMessage: {}
+      goalMessage: {},
     });
 
-    stopGoal.on('result', result => {
+    stopGoal.on('result', (result) => {
       if (result.success) {
         toast.success(result.message);
       } else {
@@ -135,15 +135,15 @@ const Command = props => {
     toast.info("Sent 'stop' message to drone.");
   };
 
-  const handleSetPump = newState => {
+  const handleSetPump = (newState) => {
     const pumpGoal = new ROSLIB.Goal({
       actionClient: actionClients['pump'],
       goalMessage: {
-        state: newState
-      }
+        state: newState,
+      },
     });
 
-    pumpGoal.on('result', result => {
+    pumpGoal.on('result', (result) => {
       if (result.success) {
         toast.success(result.message);
       } else {
@@ -162,11 +162,11 @@ const Command = props => {
       actionClient: actionClients[`valve${id}`],
       goalMessage: {
         id: id,
-        state: newState
-      }
+        state: newState,
+      },
     });
 
-    valveGoal.on('result', result => {
+    valveGoal.on('result', (result) => {
       if (result.success) {
         toast.success(result.message);
       } else {
@@ -205,7 +205,7 @@ const Command = props => {
                         className='checkbox__value'
                         style={{
                           gridArea: `jar${i + 1}`,
-                          placeSelf: 'center'
+                          placeSelf: 'center',
                         }}
                         checked={choice}
                         onChange={() => {
@@ -218,8 +218,8 @@ const Command = props => {
                   ))}
                 </div>
               ),
-              onConfirm: () => handleSample()
-            }
+              onConfirm: () => handleSample(),
+            },
           },
           {
             id: 'button-purge',
@@ -233,8 +233,8 @@ const Command = props => {
             disabled: disabled.purge,
             popconfirm: {
               title: 'Do you want to proceed?',
-              onConfirm: () => handlePurge()
-            }
+              onConfirm: () => handlePurge(),
+            },
           },
           {
             id: 'button-stop',
@@ -245,9 +245,9 @@ const Command = props => {
             disabled: disabled.stop,
             popconfirm: {
               title: 'Do you want to proceed?',
-              onConfirm: () => handleStop()
-            }
-          }
+              onConfirm: () => handleStop(),
+            },
+          },
         ]
       : [
           {
@@ -258,8 +258,8 @@ const Command = props => {
             color: 'blue',
             popconfirm: {
               title: 'Do you want to proceed?',
-              onConfirm: () => handleSetPump(!state.pump)
-            }
+              onConfirm: () => handleSetPump(!state.pump),
+            },
           },
           {
             id: 'button-valve-1',
@@ -269,8 +269,8 @@ const Command = props => {
             color: 'blue',
             popconfirm: {
               title: 'Do you want to proceed?',
-              onConfirm: () => handleSetValve(1, !state.valve1)
-            }
+              onConfirm: () => handleSetValve(1, !state.valve1),
+            },
           },
           {
             id: 'button-valve-2',
@@ -280,8 +280,8 @@ const Command = props => {
             color: 'blue',
             popconfirm: {
               title: 'Do you want to proceed?',
-              onConfirm: () => handleSetValve(2, !state.valve2)
-            }
+              onConfirm: () => handleSetValve(2, !state.valve2),
+            },
           },
           {
             id: 'button-valve-3',
@@ -291,8 +291,8 @@ const Command = props => {
             color: 'blue',
             popconfirm: {
               title: 'Do you want to proceed?',
-              onConfirm: () => handleSetValve(3, !state.valve3)
-            }
+              onConfirm: () => handleSetValve(3, !state.valve3),
+            },
           },
           {
             id: 'button-valve-4',
@@ -302,8 +302,8 @@ const Command = props => {
             color: 'blue',
             popconfirm: {
               title: 'Do you want to proceed?',
-              onConfirm: () => handleSetValve(4, !state.valve4)
-            }
+              onConfirm: () => handleSetValve(4, !state.valve4),
+            },
           },
           {
             id: 'button-valve-5',
@@ -313,8 +313,8 @@ const Command = props => {
             color: 'blue',
             popconfirm: {
               title: 'Do you want to proceed?',
-              onConfirm: () => handleSetValve(5, !state.valve5)
-            }
+              onConfirm: () => handleSetValve(5, !state.valve5),
+            },
           },
           {
             id: 'button-valve-6',
@@ -324,8 +324,8 @@ const Command = props => {
             color: 'blue',
             popconfirm: {
               title: 'Do you want to proceed?',
-              onConfirm: () => handleSetValve(6, !state.valve6)
-            }
+              onConfirm: () => handleSetValve(6, !state.valve6),
+            },
           },
           {
             id: 'button-valve-7',
@@ -335,8 +335,8 @@ const Command = props => {
             color: 'blue',
             popconfirm: {
               title: 'Do you want to proceed?',
-              onConfirm: () => handleSetValve(7, !state.valve7)
-            }
+              onConfirm: () => handleSetValve(7, !state.valve7),
+            },
           },
           {
             id: 'button-stop',
@@ -347,12 +347,12 @@ const Command = props => {
             disabled: disabled.stop,
             popconfirm: {
               title: 'Do you want to proceed?',
-              onConfirm: () => handleStop()
-            }
-          }
+              onConfirm: () => handleStop(),
+            },
+          },
         ];
 
-  const buttonsList = buttons.map(item => {
+  const buttonsList = buttons.map((item) => {
     const buttonComponent = (
       <Button
         id={item.id}
@@ -363,7 +363,7 @@ const Command = props => {
         style={{
           gridArea: item.id,
           alignSelf: 'center',
-          justifySelf: 'center'
+          justifySelf: 'center',
         }}
       />
     );
@@ -376,7 +376,7 @@ const Command = props => {
         style={{
           gridArea: item.id,
           alignSelf: 'center',
-          justifySelf: 'center'
+          justifySelf: 'center',
         }}
       >
         {buttonComponent}
@@ -393,7 +393,7 @@ const Command = props => {
       <div id={`command-grid-${active}`} className='command-grid'>
         {buttonsList}
       </div>
-      <ToastContainer />
+      <ToastContainer autoClose={false} />
     </div>
   );
 };
