@@ -8,6 +8,7 @@ class Pump {
     int getMotor();
     void turnOn();
     void turnOff();
+    void purge();
 }
 
 int getMotor() {
@@ -15,6 +16,7 @@ int getMotor() {
 }
 
 void turnOn() {
+  // 400ml/min
   digitalWrite(getMotor(), HIGH);
 }
 
