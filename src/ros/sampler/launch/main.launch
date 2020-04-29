@@ -1,9 +1,10 @@
 <!-- Launches MAVROs, ROSSERIAL & ROS Code. -->
 <launch>
-    <arg name="port" />
+    <!-- <arg name="port" /> -->
 
-    <include file="$(find sampler)/launch/apm.launch" />
-    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
-    <node pkg="rosserial_python" name="serial_node" type="serial_node.py" output="screen" args="$(arg port)" />
+    <!-- <include file="$(find sampler)/launch/apm.launch" /> -->
+    <!-- <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" /> -->
+    <!-- <node pkg="rosserial_python" name="serial_node" type="serial_node.py" output="screen" args="$(arg port)" /> -->
     <node pkg="sampler" name="main" type="main.py" output="screen" />
+    <node pkg="sampler" name="simulate" type="simulate.py" output="screen" />
 </launch>

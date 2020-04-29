@@ -1,0 +1,8 @@
+<!-- Launches MAVROS (simulation), ROSSERIAL (arduino) & ROSBRIDGE (web) Code. -->
+<launch>
+    <arg name="port" />
+
+    <include file="$(find sampler)/launch/apm.launch" />
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
+    <node pkg="rosserial_python" name="serial_node" type="serial_node.py" output="screen" args="$(arg port)" />
+</launch>
