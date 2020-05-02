@@ -32,7 +32,7 @@ dataTopics.map((name) => {
   return null;
 });
 
-const maxVolume = 60;
+const maxVolume = 70;
 
 const Data = (props) => {
   const { flow, depth } = props.state;

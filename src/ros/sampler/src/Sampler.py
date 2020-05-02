@@ -8,11 +8,12 @@ FLOW_THRESHOLD = 1.0
 DEPTH_THRESHOLD = 0.0
 
 class Sampler():
-    def __init__(self, capacities):
+    def __init__(self, capacities, threshold):
 
         # Volume of 6 Jars
         self.volume = [0.0] * len(capacities)
         self.capacities = capacities # Max Volume each jar can hold
+        self.threshold = threshold
 
         # State of Components & Sensors
         self.state = {
@@ -41,12 +42,14 @@ class Sampler():
 
     def numJarsLeft(self, ids):
         count = 0
+        # print(self.threshold, self.volume)
         for idx, val in enumerate(ids):
-            if val and not np.isclose(self.capacities[idx], self.volume[idx], rtol=1e-05, atol=1e-08, equal_nan=False):
+            if val and self.volume[idx] < self.threshold:
+            # not np.isclose(self.threshold, self.volume[idx], rtol=1e-05, atol=1e-08, equal_nan=False):
                 count += 1
         return count
 
-    def addVolume(self, ids, dt):
+    def addVolume(self, ids, dt, flow=None, add=True):
         num_jars = self.numJarsLeft(ids)
         """
         Requirements:
@@ -54,8 +57,10 @@ class Sampler():
         - A measurable flow rate
         - The tube is underwater
         """
-        if self.state['pump'] and len(self.flow_rate) > 0 and self.flow_rate[-1] > FLOW_THRESHOLD and len(self.water_depth) > 0 and self.water_depth[-1] < DEPTH_THRESHOLD:
+        # if self.state['pump'] and len(self.flow_rate) > 0 and self.flow_rate[-1] > FLOW_THRESHOLD and len(self.water_depth) > 0 and self.water_depth[-1] < DEPTH_THRESHOLD:
+        if self.state['pump'] and len(self.flow_rate) > 0 and self.flow_rate[-1] > FLOW_THRESHOLD and add:
             # Get Total Volume
+            # flow_rate = self.flow_rate[-1] if flow is None else flow
             volume = dt * max(self.flow_rate[-1], 0)
             # Distribute Amongst Ids (valves which are full should be ignored & closed)
             for idx, val in enumerate(ids):
@@ -66,7 +71,7 @@ class Sampler():
         # Calculate Eta based on remaining volume && flow_rate
         volume_remaining = 0
         for idx, val in enumerate(ids):
-            if val: volume_remaining += (self.capacities[idx] - self.volume[idx])
+            if val: volume_remaining += (self.threshold - self.volume[idx])
 
         # Calculate Eta
         eta = volume_remaining // max(self.flow_rate[-1],1) # Prevent Division by 0

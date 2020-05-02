@@ -1,0 +1,9 @@
+<!-- Launches MAVROS (simulation), ROSSERIAL (arduino) & ROSBRIDGE (web) Code. -->
+<launch>
+    <!-- <arg name="port" /> -->
+    <!-- <node pkg="rosserial_python" name="serial_node" type="serial_node.py" output="screen" args="$(arg port)" /> -->
+    <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
+        <param name="port" value="/dev/ttyACM7" />
+        <!-- <param name="baud" value="115200" /> -->
+    </node>
+</launch>

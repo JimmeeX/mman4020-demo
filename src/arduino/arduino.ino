@@ -15,7 +15,7 @@ PIN DEFINITIONS
 const int FLOW_PIN = 13;
 
 // Relay Board
-const int RELAY_ENABLE_1 = 1; // Valve 1
+const int RELAY_ENABLE_1 = 9; // Valve 1
 const int RELAY_ENABLE_2 = 2; // Valve 2
 const int RELAY_ENABLE_3 = 3; // Valve 3
 const int RELAY_ENABLE_4 = 4; // Valve 4
@@ -39,7 +39,6 @@ Solenoid valve6 = Solenoid(RELAY_ENABLE_6);
 Solenoid valve7 = Solenoid(RELAY_ENABLE_7);
 
 Pump pump = Pump(RELAY_ENABLE_8);
-//FlowRateSensor flow;
 
 ros::NodeHandle nh;
 std_msgs::Float32 flow_msg;
@@ -86,41 +85,51 @@ void handle_pump(const std_msgs::Bool& msg){
 DEFINE PUBLISHERS/SUBSCRIBERS
 *****************************
 */
-ros::Publisher pub_flow("/arduino/flow", &flow_msg);
+//ros::Publisher pub_flow("/arduino/test", &flow_msg);
 
-ros::Subscriber<std_msgs::Bool> valve1_sub("/arduino/valve1", &handle_valve1);
-ros::Subscriber<std_msgs::Bool> valve2_sub("/arduino/valve2", &handle_valve2);
-ros::Subscriber<std_msgs::Bool> valve3_sub("/arduino/valve3", &handle_valve3);
-ros::Subscriber<std_msgs::Bool> valve4_sub("/arduino/valve4", &handle_valve4);
-ros::Subscriber<std_msgs::Bool> valve5_sub("/arduino/valve5", &handle_valve5);
-ros::Subscriber<std_msgs::Bool> valve6_sub("/arduino/valve6", &handle_valve6);
-ros::Subscriber<std_msgs::Bool> valve7_sub("/arduino/valve7", &handle_valve7);
+//ros::Subscriber<std_msgs::Bool> valve1_sub("/arduino/valve1", &handle_valve1);
+//ros::Subscriber<std_msgs::Bool> valve2_sub("/arduino/valve2", &handle_valve2);
+//ros::Subscriber<std_msgs::Bool> valve3_sub("/arduino/valve3", &handle_valve3);
+//ros::Subscriber<std_msgs::Bool> valve4_sub("/arduino/valve4", &handle_valve4);
+//ros::Subscriber<std_msgs::Bool> valve5_sub("/arduino/valve5", &handle_valve5);
+//ros::Subscriber<std_msgs::Bool> valve6_sub("/arduino/valve6", &handle_valve6);
+//ros::Subscriber<std_msgs::Bool> valve7_sub("/arduino/valve7", &handle_valve7);
 ros::Subscriber<std_msgs::Bool> pump_sub("/arduino/pump", &handle_pump);
 
 
 void setup()
 {
+  
   // Setup Pins
-  pinMode(FLOW_PIN, INPUT);
+//  pinMode(RELAY_ENABLE_1, OUTPUT);
+//  pinMode(RELAY_ENABLE_2, OUTPUT);
+//  pinMode(RELAY_ENABLE_3, OUTPUT);
+//  pinMode(RELAY_ENABLE_4, OUTPUT);
+//  pinMode(RELAY_ENABLE_5, OUTPUT);
+//  pinMode(RELAY_ENABLE_6, OUTPUT);
+//  pinMode(RELAY_ENABLE_7, OUTPUT);
+  pinMode(RELAY_ENABLE_8, OUTPUT);
+  
+  digitalWrite(RELAY_ENABLE_8, HIGH);
+
 
   // Setup Publishers/Subscribers
   nh.initNode();
 
-  nh.advertise(pub_flow);
+//  nh.advertise(pub_flow);
 
-  nh.subscribe(valve1_sub);
-  nh.subscribe(valve2_sub);
-  nh.subscribe(valve3_sub);
-  nh.subscribe(valve4_sub);
-  nh.subscribe(valve5_sub);
-  nh.subscribe(valve6_sub);
-  nh.subscribe(valve7_sub);
+//  nh.subscribe(valve1_sub);
+//  nh.subscribe(valve2_sub);
+//  nh.subscribe(valve3_sub);
+//  nh.subscribe(valve4_sub);
+//  nh.subscribe(valve5_sub);
+//  nh.subscribe(valve6_sub);
+//  nh.subscribe(valve7_sub);
   nh.subscribe(pump_sub);
 }
 
 void loop()
 {
-  // readFlow();
   nh.spinOnce();
 }
 

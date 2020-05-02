@@ -15,9 +15,9 @@ void Solenoid::set(bool value) {
 };
 
 void Solenoid::openValve() {
-    digitalWrite(pin, HIGH);
+    digitalWrite(pin, LOW);
 };
 
 void Solenoid::closeValve() {
-    digitalWrite(pin, LOW);
+    digitalWrite(pin, HIGH);
 };

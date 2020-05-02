@@ -16,9 +16,9 @@ void Pump::set(bool value) {
 
 void Pump::turnOn() {
     // 400ml/min
-    digitalWrite(pin, HIGH);
+    digitalWrite(pin, LOW);
 }
 
 void Pump::turnOff() {
-    digitalWrite(pin, LOW);
+    digitalWrite(pin, HIGH);
 }

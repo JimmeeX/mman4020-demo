@@ -26,10 +26,13 @@ import time
 
 SLEEP_RATE = 3 # Hz (ie, 3 times/second)
 
-PURGE_DURATION = 10 # Seconds
+PURGE_DURATION = 17 # Seconds
+PAD_DURATION = 7
+
 NUM_JARS = 6
 NUM_VALVES = 7
-JAR_CAPACITIES = [60.0] * NUM_JARS # Max Volume (mL)
+JAR_CAPACITIES = [70.0] * NUM_JARS # Max Volume (mL)
+JAR_THRESHOLD = 60.0
 
 class Main():
     def __init__(self):
@@ -38,7 +41,7 @@ class Main():
         self.rate = rospy.Rate(SLEEP_RATE)
 
         """Initialise Water Sampler Class"""
-        self.sampler = Sampler(JAR_CAPACITIES)
+        self.sampler = Sampler(JAR_CAPACITIES, JAR_THRESHOLD)
 
         """Initialise Publishers"""
         # Arduino Control Panel
@@ -137,15 +140,15 @@ class Main():
             )
             self.action_servers['sample'].set_aborted(result)
 
-        elif not self.sampler.is_purged:
-            # Return Error Message to Purge System
-            print("System requires purging. Sending 'Sample' Error Message to Web GUI")
-            result = SampleResult(
-                capacities=self.sampler.volume,
-                success=False,
-                message='System requires purging.'
-            )
-            self.action_servers['sample'].set_aborted(result)
+        # elif not self.sampler.is_purged:
+        #     # Return Error Message to Purge System
+        #     print("System requires purging. Sending 'Sample' Error Message to Web GUI")
+        #     result = SampleResult(
+        #         capacities=self.sampler.volume,
+        #         success=False,
+        #         message='System requires purging.'
+        #     )
+        #     self.action_servers['sample'].set_aborted(result)
 
         elif num_jars == 0:
             # Return Error Message to Purge System
@@ -173,8 +176,31 @@ class Main():
             self.pump_pub.publish(True)
             self.rate.sleep()
 
+            if goal.jars[0] or goal.jars[1]:
+                # Padding Time (for water to go up tube)
+                counter = 0
+                while counter < PAD_DURATION * SLEEP_RATE and not self.sampler.isFull(goal.jars) and not rospy.is_shutdown():
+                    counter += 1
+                    dt = 1.0 / SLEEP_RATE # second elapsed
+                    eta = PAD_DURATION - (counter // SLEEP_RATE) + self.sampler.addVolume(goal.jars, dt, add=False)
+
+                    # Publish Jar Capacities
+                    for idx, volume in enumerate(self.sampler.volume):
+                        self.jar_pub[idx].publish(volume)
+
+                    # Publish Feedback
+                    feedback = SampleFeedback(
+                        capacities=self.sampler.volume,
+                        eta=eta
+                    )
+                    self.action_servers['sample'].publish_feedback(feedback)
+
+                    self.rate.sleep()
+
+
             # Pump Water until full
             while not self.sampler.isFull(goal.jars) and not rospy.is_shutdown():
+
                 dt = 1.0 / SLEEP_RATE # second elapsed
                 eta = self.sampler.addVolume(goal.jars, dt)
 

@@ -393,7 +393,7 @@ const Command = (props) => {
       <div id={`command-grid-${active}`} className='command-grid'>
         {buttonsList}
       </div>
-      <ToastContainer autoClose={false} />
+      <ToastContainer />
     </div>
   );
 };
