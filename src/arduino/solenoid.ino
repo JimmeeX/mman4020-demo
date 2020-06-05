@@ -1,16 +1,6 @@
-// Functions to deal with Solenoid Valves (Note there are 7 instances)
-/*
- * Solenoid is connected to the relay board, so it corresponds with the module number
- * 7 Solenoids = 7 Relay outputs
- * - RELAY_ENABLE_1
- * - RELAY_ENABLE_2
- * - RELAY_ENABLE_3
- * - RELAY_ENABLE_4
- * - RELAY_ENABLE_5
- * - RELAY_ENABLE_6
- * - RELAY_ENABLE_7
-*/
-
+/**************************
+Valve IDs range from 1 - 7 
+**************************/
 class Solenoid {
   public:
     void openValve(int id);
@@ -19,10 +9,10 @@ class Solenoid {
 
 void openValve(int id) {
   // Actuate the solenoid to OPEN
-  digitalWrite(id, HIGH);
+  digitalWrite(id, LOW);
 }
 
 void closeValve(int id) {
   // Go back to default state (closed)
-  digitalWrite(id, LOW); 
+  digitalWrite(id, HIGH); 
 }

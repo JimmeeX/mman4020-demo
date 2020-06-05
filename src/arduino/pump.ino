@@ -1,14 +1,12 @@
-// Functions to deal with Peristaltic Pump
-
 class Pump {
   private:
-    const int motor;
+    const int motor; // Arduino pin connection
     
   public:
-    int getMotor();
-    void turnOn();
-    void turnOff();
-    void purge();
+    int getMotor(); // Retrieves pin connection
+    void turnOn(); // Turns on the motor
+    void turnOff(); // Turns off the motor
+    void purge(); // Execute purge cycle
 }
 
 int getMotor() {
@@ -17,9 +15,9 @@ int getMotor() {
 
 void turnOn() {
   // 400ml/min
-  digitalWrite(getMotor(), HIGH);
+  digitalWrite(getMotor(), LOW);
 }
 
 void turnOff() {
-  digitalWrite(getMotor(), LOW);
+  digitalWrite(getMotor(), HIGH);
 }

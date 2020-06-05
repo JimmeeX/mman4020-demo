@@ -1,17 +1,15 @@
-// Functions to deal with Flow Rate Sensor
-
-class FlowRateSensor {
+class FlowSensor {
   private:
-    const int flowPin; // Input pin
-    double flowRate; // Value to calculate
+    const int pin; // Arduino connection
+    double flowRate; // Calculated flow rate
     volatile int pulses; // Interrupt variable
     
   public:
-    int getFlowPin();
-    void setFlowPin(int flowPin);
-    void resetCount();
-    void flowPulse();
-    void calculateFlow();
+    int getPin(); // Retrieve pin connection
+    void setPin(int pin); // Change assigned pin
+    void resetCount(); // Resets flow pin/min
+    void pulse(); // Regularly tracks inflow
+    void calculateFlow(); // Calculates of flow
 }
 
 int getFlowPin() {
